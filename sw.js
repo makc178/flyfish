@@ -1,4 +1,4 @@
-const V='ff-6802e22af5',F=["./", "index.html", "app.js", "Manrope.woff2", "Cormorant.woff2", "manifest.webmanifest", "icon-192.png", "apple-touch-icon.png", "art/rod.svg", "art/reel.svg", "art/line.svg"];
+const V='ff-f57d714341',F=["./", "index.html", "app.js", "Manrope.woff2", "Cormorant.woff2", "manifest.webmanifest", "icon-192.png", "apple-touch-icon.png", "art/rod.svg", "art/reel.svg", "art/line.svg"];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(V).then(c=>c.addAll(F)))});
 self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin)return;
