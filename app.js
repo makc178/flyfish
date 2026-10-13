@@ -129,7 +129,7 @@ let VIEW = {t: 'home'}, OPEN = null; const HIST = [];
 const go = v => { HIST.push(VIEW); VIEW = v; OPEN = null; render(); scrollTo(0, 0); };
 const back = () => { VIEW = HIST.pop() || {t: 'home'}; render(); };
 function start() { VIEW = {t: 'home'}; render(); if (S.sync.token) syncNow(); }
-const ART = {rods: 'art/rod.svg', reels: 'art/reel.svg', lines: 'art/line.svg'};
+const ART = {rods: 'art/rod.webp', reels: 'art/reel.webp', lines: 'art/line.svg'};
 const SEC = {rods: T.home.sections.rods, reels: T.home.sections.reels, lines: T.home.sections.lines};
 const TL = t => T.line_types[t] || (t === 'tip' ? 'Сменный конец' : t);
 const RT = {single: 'одноручное', double: 'двуручное', switch: 'свитч'};
@@ -150,6 +150,7 @@ const ICO = {
 const SC = {ok: '#3DDC97', edge: '#FFD166', fb: '#FF6B4A', apx: '#9AA4B2'};
 const stOf = m => m.kind === 'edge' ? 'edge' : m.lvl === 'ok' ? 'ok' : 'fb';
 const stLbl = m => m.kind === 'edge' ? T.rod_card.on_edge : m.lvl === 'ok' ? 'Подходит' : m.kind === 'near' ? 'Запасной ' + m.devTxt : m.kind === 'cls' ? T.rod_card.fallback : 'Запасной';
+const coil = s => `<span class="coil" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${SC[s]}" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="4"/><path d="M21 12c2 4-1 8-5 9"/></svg></span>`;
 const chip = (s, t) => `<span class="st s-${s}">${esc(t)}</span>`;
 const apxBtn = (k, short) => `<button class="st s-apx" data-hint="${esc(APX[k])}" aria-label="${esc(T.rod_card.approx_window)}: подсказка">≈ ${esc(T.rod_card.approx_window)}${short ? '' : ' <i>i</i>'}</button>`;
 const mNote = m => m.kind === 'near' ? T.rod_card.fallback_weight_hint : m.kind === 'cls' ? T.rod_card.fallback_hint : m.lvl === 'fb' && m.why ? m.why : m.why || '';
@@ -197,9 +198,9 @@ function home() { const c = k => S[k].length, ab = (k, t) => S[k].filter(x => in
 function scale(rg, w, m = {}) { if (!rg || w == null) return ''; const mn = Math.min(rg.lo, w) - 4, mx = Math.max(rg.hi, w) + 4, p = x => (x - mn) / (mx - mn) * 100, s = m.kind ? stOf(m) : 'ok', ap = apxOf(rg);
   return `<div class="scale"><div class="t"></div><div class="a" style="left:${p(rg.lo)}%;width:${Math.max(p(rg.hi) - p(rg.lo), 1.5)}%;${ap ? 'background:#9AA4B2' : ''}"></div><div class="k" style="left:${p(w)}%;background:${SC[s]}"></div><span class="n" style="left:${p(rg.lo)}%">${fg(rg.lo)}</span>${rg.hi !== rg.lo ? `<span class="n" style="left:${p(rg.hi)}%">${fg(rg.hi)}</span>` : ''}</div>`; }
 const mBadge = (m, small) => `<div class="bdgs">${chip(stOf(m), stLbl(m))}${m.rg && apxOf(m.rg) ? apxBtn(apxOf(m.rg), 1) : ''}</div>${!small && mNote(m) ? `<div class="mut sm2" style="margin-top:4px">${esc(mNote(m))}</div>` : ''}`;
-function lineRow(l, m, full) { const s = stOf(m);
-  return `<button class="lr" data-open="line:${l.id}"><span class="dot" style="background:${SC[s]}"></span><div style="flex:1;min-width:0"><div class="t">${esc(name(l))}</div><div class="mono mut sm">${esc(TL(l.type))} · ${Math.round(m.w * GR)} gr · ${fg(m.w)} г${m.tip ? ' · + ' + esc(m.tip.name || 'конец') : ''}</div>${full && mNote(m) ? `<div class="mut sm2" style="margin-top:2px">${esc(mNote(m))}</div>` : ''}</div><div class="bdgs r">${chip(s, stLbl(m))}${m.rg && apxOf(m.rg) ? chip('apx', '≈') : ''}</div></button>`; }
-function reelRow(x) { return `<button class="card row rr" data-open="reel:${x.x.id}"><div class="row" style="gap:12px;min-width:0"><div class="thumb">${artBox('reels')}</div><div style="min-width:0"><div class="t">${esc(name(x.x))}</div><div class="mut sm2">Катушка${x.x.cls ? ' · ' + clsTxt(x.x.cls) : ''}${x.lvl === 'ok' ? '' : ' · ' + esc(x.why)}</div></div></div>${chip(x.lvl === 'ok' ? 'ok' : 'fb', x.lvl === 'ok' ? 'Подходит' : 'Запасной')}</button>`; }
+function lineRow(l, m, full, ic) { const s = stOf(m); full = 0;
+  return `<button class="lr" data-open="line:${l.id}">${ic ? coil(s) : `<span class="dot" style="background:${SC[s]}"></span>`}<div style="flex:1;min-width:0"><div class="t">${esc(name(l))}</div><div class="mono mut sm">${esc(TL(l.type))} · ${Math.round(m.w * GR)} gr · ${fg(m.w)} г${m.tip ? ' · + ' + esc(m.tip.name || 'конец') : ''}</div>${full && mNote(m) ? `<div class="mut sm2" style="margin-top:2px">${esc(mNote(m))}</div>` : ''}</div><div class="bdgs r">${chip(s, stLbl(m))}</div></button>`; }
+function reelRow(x) { return `<button class="card row rr" data-open="reel:${x.x.id}"><div class="row" style="gap:12px;min-width:0"><div class="thumb rl">${artBox('reels', 'background-size:86%')}</div><div style="min-width:0"><div class="t">${esc(name(x.x))}</div><div class="mut sm2">Катушка${x.x.cls ? ' · ' + clsTxt(x.x.cls) : ''}${x.lvl === 'ok' ? '' : ' · ' + esc(x.why)}</div></div></div>${chip(x.lvl === 'ok' ? 'ok' : 'fb', x.lvl === 'ok' ? 'Подходит' : 'Запасной')}</button>`; }
 function rodExp(r) { const ls = rodLines(r), rs = rodReels(r);
   return `<div class="exp">${gaugesFor(r, ls)}<div class="cap" style="margin:8px 0 2px">${esc(T.rod_card.matches_title)}</div>${ls.length ? ls.map(x => lineRow(x.l, x.m)).join('') : `<div class="mut">${esc(T.empty.no_match)}</div>`}
   <div class="cap" style="margin:12px 0 6px">${esc(T.list.matching_reels)}</div>${rs.length ? rs.map(reelRow).join('') : '<div class="mut">—</div>'}<button class="more" data-open="rod:${r.id}">${esc(T.list.more)} ›</button></div>`; }
@@ -221,19 +222,19 @@ function list(k) { const tab = VIEW.tab || 'double', all = S[k], xs = all.filter
   ${xs.length > 5 ? `<label class="f" style="margin-top:10px"><input id="q" placeholder="${esc(T.list.search)}" value="${esc(VIEW.q || '')}" aria-label="${esc(T.list.search)}"></label>` : ''}</div>
   <div class="w" style="margin-top:14px">${fx.length ? fx.map(x => `<div class="it">${itemHead(k, x)}${OPEN === x.id ? (k === 'rods' ? rodExp(x) : k === 'reels' ? reelExp(x) : lineExp(x)) : ''}</div>`).join('') : emptyBox(k)}</div>`; }
 function emptyBox(k) { return `<div class="empty"><div class="eph">${artBox(k)}</div><div class="h2" style="line-height:1.3">${esc(T.empty[k])}</div><button class="btn" style="margin-top:20px" data-new="${k}">+ ${esc(T.empty.button)}</button></div>`; }
-function cardTop(k, x) { return `<div class="chero"><div class="glow"></div>${artBox(k, `inset:${k === 'rods' ? '40px -24px 30px -24px' : '60px 20% 20px'};background-size:contain;transform:${k === 'rods' ? 'rotate(-14deg)' : 'none'}`)}<div class="w row top" style="position:relative"><button class="cb" data-back aria-label="Назад">${ICO.back}</button><button class="pill" data-edit="${k}:${x.id}">${esc(T.rod_card.edit)}</button></div></div>`; }
+function cardTop(k, x) { return `<div class="chero ${k}"><div class="glow"></div>${artBox(k, k === 'rods' ? 'inset:40px -30px 50px -20px;background-size:contain' : 'inset:70px 25% 40px;background-size:contain')}<div class="w row top" style="position:relative"><button class="cb" data-back aria-label="Назад">${ICO.back}</button><button class="pill" data-edit="${k}:${x.id}">${esc(T.rod_card.edit)}</button></div></div>`; }
 const stats = a => `<div class="mono specs">${a.filter(([, v]) => v && v !== '—').map(([s, v]) => `<span title="${esc(s)}">${v}</span>`).join('')}</div>`;
 const buyBlock = x => x.buy && Object.keys(x.buy).length ? `<div class="card" style="margin-top:12px"><div class="cap">Покупка</div><div class="mut sm2" style="margin-top:4px">${[x.buy.date, x.buy.shop, x.buy.price_eur != null ? String(x.buy.price_eur).replace('.', ',') + ' € без НДС' : ''].filter(Boolean).map(esc).join(' · ')}</div></div>` : '';
 const noteBlock = x => x.note ? `<div class="mut" style="margin-top:12px">${esc(x.note)}</div>` : '';
 const delBtn = (k, x) => `<button class="btn r" style="margin-top:22px" data-del="${k}:${x.id}">${esc(T.rod_card.delete)}</button>`;
-const titleBlock = (cap, x) => `<div class="cap">${cap}</div><h1 class="h1 big2">${esc(x.model || '')}</h1>`;
+const titleBlock = (cap, x) => `<div class="cap mono">${cap}</div><h1 class="h1 big2">${esc(x.model || '')}</h1>`;
 function rodCard(r) { const ls = rodLines(r), rs = rodReels(r);
   return cardTop('rods', r) + `<div class="w ctxt">${titleBlock(`${esc(r.brand || '')} · ${RT[r.type] || ''}`, r)}${stats([['Длина', esc(r.length || '—')], ['Класс', esc(r.class || '—')]])}
   <div class="card gcard">${gaugesFor(r, ls) || `<div class="mut">Окна Scandi и Skagit не указаны</div>`}</div>
-  <div class="row" style="margin-top:20px"><h2 class="h2">${esc(T.rod_card.matches_title)}</h2><span class="mut mono">${ls.length}</span></div><div class="mut sm2" style="margin:2px 0 4px">${esc(T.rod_card.matches_hint)}</div>
-  ${ls.length ? ls.map(x => lineRow(x.l, x.m, 1)).join('') : `<div class="mut">${esc(T.empty.no_match)}</div>`}
-  <div class="cap" style="margin:18px 0 6px">${esc(T.list.matching_reels)}</div>${rs.map(reelRow).join('') || '<div class="mut">—</div>'}
-  ${recBlock(r)}${r.rio?.note ? `<div class="mut sm2" style="margin-top:6px">${esc(r.rio.note)}</div>` : ''}${r.source ? `<div class="mut sm2" style="margin-top:8px;word-break:break-all">Источник: ${esc(r.source)}</div>` : ''}${noteBlock(r)}${buyBlock(r)}${delBtn('rods', r)}</div>`; }
+  <div class="row" style="margin-top:20px"><h2 class="h2">${esc(T.rod_card.matches_title)}</h2><span class="mut mono">${ls.length}</span></div>
+  ${ls.length ? ls.map(x => lineRow(x.l, x.m)).join('') : `<div class="mut">${esc(T.empty.no_match)}</div>`}
+  ${rs.map(reelRow).join('').replace(/class="card row rr"/g, 'class="card row rr" style="margin-top:12px"')}
+  <div class="mut sm2" style="margin-top:14px">${esc(T.rod_card.matches_hint)}</div>${recBlock(r)}${r.rio?.note ? `<div class="mut sm2" style="margin-top:6px">${esc(r.rio.note)}</div>` : ''}${r.source ? `<div class="mut sm2" style="margin-top:8px;word-break:break-all">Источник: ${esc(r.source)}</div>` : ''}${noteBlock(r)}${buyBlock(r)}${delBtn('rods', r)}</div>`; }
 function reelCard(x) { const fit = x.hand === 'both' ? T.reel_card.fits_both : x.hand === 'single' ? T.reel_card.fits_single : x.hand === 'double' ? T.reel_card.fits_double : 'не указано';
   return cardTop('reels', x) + `<div class="w ctxt">${titleBlock(`${esc(x.brand || '')} · катушка`, x)}${stats([['Классы', x.cls ? clsTxt(x.cls) : esc(x.size || '—')], ['Размер', esc(x.size || '')]])}<div class="card" style="margin-top:14px"><b>${esc(T.reel_card.fits)}:</b> ${esc(fit)}</div>${reelExp(x).replace(/<button class="more"[^]*?<\/button>/, '')}${noteBlock(x)}${buyBlock(x)}${delBtn('reels', x)}</div>`; }
 function lineCard(l) { const g = lineG(l);
@@ -246,21 +247,21 @@ function dotChart(r, ls) { const W = 340, H = 200, ay = 154, L = 14, R = 14; con
   const mn = Math.floor(Math.min(...all) - 2), mx = Math.ceil(Math.max(...all) + 2), x = g => L + (g - mn) / (mx - mn) * (W - L - R);
   let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Шнуры на оси веса, граммы">`; const step = mx - mn > 24 ? 4 : 2;
   for (let g = mn; g <= mx; g++) { s += `<line x1="${x(g).toFixed(1)}" x2="${x(g).toFixed(1)}" y1="${ay + 4}" y2="${ay + (g % step ? 9 : 14)}" stroke="#5B6470"/>`; if (g % step === 0) s += `<text x="${x(g).toFixed(1)}" y="${ay + 30}" text-anchor="middle" class="ga">${g}</text>`; }
-  [['scandi', '#E9EEF2'], ['skagit', '#7F95A8']].forEach(([t, c], i) => { const g = r[t + '_g']; if (!g) return; const ap = apxOf(g), lo = ap && g.lo === g.hi ? g.lo - 1.5 : g.lo, hi = ap && g.lo === g.hi ? g.hi + 1.5 : g.hi, col = ap ? SC.apx : c, w = Math.max(x(hi) - x(lo), 3);
-    s += `<rect x="${x(lo).toFixed(1)}" y="38" width="${w.toFixed(1)}" height="${ay - 38}" fill="${col}" opacity=".12"/><rect x="${x(lo).toFixed(1)}" y="${ay - 6}" width="${w.toFixed(1)}" height="6" fill="${col}" ${ap ? 'opacity=".7"' : ''}/>`;
-    s += `<text x="${Math.min(W - 70, Math.max(70, (x(lo) + x(hi)) / 2)).toFixed(1)}" y="${13 + i * 17}" text-anchor="middle" class="gw" fill="${col}">${t.toUpperCase()} ${esc(winShort(g).replace('~', '≈'))}</text>`; });
-  const ys = [52, 74, 96, 118, 63, 85, 107, 129]; pts.forEach((p, i) => { const cx = x(p.m.w), y = ys[i % ys.length], c = SC[stOf(p.m)], rt = cx > W - 80;
+  const sg = r.scandi_g, kg = r.skagit_g, ov = sg && kg && Math.abs((x(kg.lo) + x(kg.hi)) / 2 - (x(sg.lo) + x(sg.hi)) / 2) < 78; [['scandi', '#E9EEF2'], ['skagit', '#7F95A8']].forEach(([t, c], i) => { const g = r[t + '_g']; if (!g) return; const ap = apxOf(g), lo = ap && g.lo === g.hi ? g.lo - 1.5 : g.lo, hi = ap && g.lo === g.hi ? g.hi + 1.5 : g.hi, col = ap ? SC.apx : c, w = Math.max(x(hi) - x(lo), 3);
+    s += `<rect x="${x(lo).toFixed(1)}" y="${ov ? 38 : 22}" width="${w.toFixed(1)}" height="${ay - (ov ? 38 : 22)}" fill="${col}" opacity=".12"/><rect x="${x(lo).toFixed(1)}" y="${ay - 6}" width="${w.toFixed(1)}" height="6" fill="${col}" ${ap ? 'opacity=".7"' : ''}/>`;
+    s += `<text x="${ov ? Math.min(W - 70, Math.max(70, (x(lo) + x(hi)) / 2)).toFixed(1) : ((x(lo) + x(hi)) / 2).toFixed(1)}" y="${13 + (ov ? i * 17 : 0)}" text-anchor="middle" class="gw" fill="${col}">${t.toUpperCase()} ${esc(winShort(g).replace('~', '≈'))}</text>`; });
+  const ys = ov ? [52, 74, 96, 118, 63, 85, 107, 129] : [44, 76, 58, 92, 110, 66, 100, 50]; pts.forEach((p, i) => { const cx = x(p.m.w), y = ys[i % ys.length], c = SC[stOf(p.m)], rt = cx > W - 80;
     s += `<line x1="${cx.toFixed(1)}" x2="${cx.toFixed(1)}" y1="${y}" y2="${ay - 7}" stroke="${c}" stroke-dasharray="2 3"/><circle cx="${cx.toFixed(1)}" cy="${y}" r="7" fill="${c}" stroke="#0C0F12" stroke-width="2.5"/><text x="${(cx + (rt ? -11 : 11)).toFixed(1)}" y="${y + 4}" text-anchor="${rt ? 'end' : 'start'}" class="gd">${Math.round(p.m.w * GR)} gr</text>`; });
   return s + '</svg>'; }
 function pick() { if (!S.rods.length) return head('Подбор') + `<div class="w">${emptyBox('rods')}</div>`;
   const best = S.rods.map(r => ({r, n: okN(rodLines(r))})).sort((a, b) => b.n - a.n)[0].r; const r = S.rods.find(x => x.id === VIEW.sel) || best, ls = rodLines(r);
   const cnt = {ok: 0, edge: 0, fb: 0, apx: 0}; ls.forEach(x => { cnt[stOf(x.m)]++; if (x.m.rg && apxOf(x.m.rg)) cnt.apx++; });
   const aw = ['scandi', 'skagit'].filter(t => apxOf(r[t + '_g']));
-  return head('Подбор') + `<div class="hs rods" role="tablist" aria-label="Удилище">${S.rods.map(x => `<button class="rchip ${x.id === r.id ? 'on' : ''}" data-sel="${x.id}" role="tab" aria-selected="${x.id === r.id}"><div class="thumb s">${artBox('rods')}</div><div style="text-align:left;min-width:0"><div class="t">${esc(x.model)}</div><div class="mono mut sm">${esc(x.class || '—')} · ${esc(x.length || '—')}</div></div></button>`).join('')}</div>
+  return head('Подбор') + `<div class="hs rods" role="tablist" aria-label="Удилище">${S.rods.map(x => `<button class="rchip ${x.id === r.id ? 'on' : ''}" data-sel="${x.id}" role="tab" aria-selected="${x.id === r.id}"><div class="thumb s rd">${artBox('rods', 'background-size:160%;background-position:40% 50%')}</div><div style="text-align:left;min-width:0"><div class="t">${esc(x.model)}</div><div class="mono mut sm">${esc(x.class || '—')} · ${esc(x.length || '—')}</div></div></button>`).join('')}</div>
   <div class="w"><div class="card chart">${dotChart(r, ls) || `<div class="mut">Окна Scandi и Skagit не указаны, подбор по классу</div>`}</div>
   <div class="legend">${[['ok', 'Подходит'], ['edge', T.rod_card.on_edge], ['fb', 'Запасной'], ['apx', T.rod_card.approx_window]].map(([k, t]) => `<span><i style="background:${SC[k]}"></i>${t} <b class="mono">${cnt[k]}</b></span>`).join('')}</div>
-  ${ls.length ? ls.map(x => `<div class="pr">${lineRow(x.l, x.m, 1)}</div>`).join('') : `<div class="mut" style="margin-top:10px">${esc(T.empty.no_match)}</div>`}
-  ${aw.map(t => `<div class="card dash row" style="margin-top:8px">${apxBtn(apxOf(r[t + '_g']))}<span class="mono mut sm">${t === 'scandi' ? 'Scandi' : 'Skagit'} · ${esc(winShort(r[t + '_g']))} ±1,5 г</span></div>`).join('')}
+  ${ls.length ? ls.map(x => `<div class="pr">${lineRow(x.l, x.m, 0, 1)}</div>`).join('') : `<div class="mut" style="margin-top:10px">${esc(T.empty.no_match)}</div>`}
+  ${aw.map(t => `<div class="card dash row" style="margin-top:8px">${apxBtn(apxOf(r[t + '_g']), 1)}<span class="mono mut sm" style="text-align:right">${esc(r.model)} · ${t === 'scandi' ? 'Scandi' : 'Skagit'} ${esc(winShort(r[t + '_g']))} ±1,5 г</span></div>`).join('')}
   <button class="more" data-open="rod:${r.id}">Карточка удилища ›</button></div>`; }
 function search() { const q = (VIEW.q || '').trim(), ql = q.toLowerCase(), w = /^\d+([.,]\d+)?\s*(г|g)?$/i.test(q) ? num(q.replace(/[^\d.,]/g, '')) : null;
   let h = `<div class="w top"><div class="row" style="gap:10px"><label class="srch in" style="flex:1;margin:0">${ICO.search}<input id="sq" type="search" enterkeyhint="search" placeholder="Модель или вес, например 35" value="${esc(q)}" aria-label="Поиск" autocomplete="off"></label>${q ? `<button class="lnk ac" data-clr>Сброс</button>` : ''}</div>`;
