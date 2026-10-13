@@ -101,20 +101,21 @@ function combos(l) { const b = lineG(l), bg = lineGr(l); if (b == null) return [
   if (tipped && tips.length) return tips.map(t => ({w: b + num(t.w_g), gr: bg + num(t.w_g) * GR, tip: t}));
   return [{w: b, gr: bg, noTip: tipped && l.type === 'skagit'}]; }
 /* границы включительно; сравнение и в граммах (±0,05 г на округление), и в грейнах (±1 gr), если они есть у обоих */
-function fit(c, g, gr) { const tol = g.approx ? 1.5 : 0;
+function fit(c, g, gr, t) { const tol = g.approx ? 1.5 : 0;
   const inG = c.w >= g.lo - tol - 0.05 && c.w <= g.hi + tol + 0.05, inGr = gr && c.gr != null && !g.approx && c.gr >= gr.lo - 1 && c.gr <= gr.hi + 1;
   if (inG || inGr) { const edge = !g.approx && (Math.abs(c.w - g.lo) <= 0.3 || Math.abs(c.w - g.hi) <= 0.3 || (gr && c.gr != null && (Math.abs(c.gr - gr.lo) <= 3 || Math.abs(c.gr - gr.hi) <= 3))); return {in: true, edge}; }
-  const dev = c.w < g.lo - tol ? c.w - (g.lo - tol) : c.w - (g.hi + tol), base = dev < 0 ? g.lo : g.hi;
-  return Math.abs(dev) <= 2 || Math.abs(dev) / base <= 0.08 ? {in: false, near: true, dev} : null; }
+  const dev = c.w < g.lo - tol ? c.w - (g.lo - tol) : c.w - (g.hi + tol);
+  if (t === 'skagit') { const gd = gr && c.gr != null ? (c.gr < gr.lo ? c.gr - gr.lo : c.gr - gr.hi) : dev * GR; return Math.abs(gd) <= 25 ? {in: false, near: true, dev, devTxt: `${gd > 0 ? '+' : '−'}${Math.round(Math.abs(gd))} gr`} : null; }
+  return dev >= -2 - 1e-9 && dev <= 1 + 1e-9 ? {in: false, near: true, dev, devTxt: `${dev > 0 ? '+' : '−'}${fg(Math.abs(dev))} г`} : null; }
 const RANK = {ok: 0, edge: 1, near: 2, fb: 3, cls: 4};
 function matchLine(r, l) { /* → null | {lvl:'ok'|'fb', kind, w, tip, rg, why, dev} */
   if (l.hand && l.hand !== 'both' && l.hand !== hand(r)) return null;
   const rg = rodRange(r, l.type), rgr = l.type === 'skagit' ? r.skagit_gr : (l.type === 'scandi' || l.type === 'integrated') ? r.scandi_gr : null;
   if (rg) { let best = null;
-    for (const c of combos(l)) { const f = fit(c, rg, rgr); if (!f) continue;
+    for (const c of combos(l)) { const f = fit(c, rg, rgr, l.type); if (!f) continue;
       const body = l.body && !c.tip, soft = rg.analog || rg.approx || body;
       const kind = f.near ? 'near' : soft ? 'fb' : f.edge ? 'edge' : 'ok';
-      const m = {lvl: kind === 'ok' || kind === 'edge' ? 'ok' : 'fb', kind, w: c.w, tip: c.tip, rg, dev: f.dev,
+      const m = {lvl: kind === 'ok' || kind === 'edge' ? 'ok' : 'fb', kind, w: c.w, tip: c.tip, rg, dev: f.dev, devTxt: f.devTxt,
         why: kind === 'near' ? T.rod_card.fallback_weight : body ? 'вес тела без сменного конца' : rg.analog ? 'граммовка по аналогу' : rg.approx ? 'граммовка ориентировочная' : c.noTip ? 'без учёта сменного конца' : ''};
       if (!best || RANK[m.kind] < RANK[best.kind]) best = m; }
     return best; }
@@ -151,8 +152,8 @@ function home() { const c = k => S[k].length, ab = (k, t) => S[k].filter(x => in
   <div class="w mut" style="margin-top:14px;font-style:italic;font-size:12px">${esc(T.home.hint)}</div>${!S.sync.token ? `<div class="w" style="margin-top:14px"><div class="exp mut">Чтобы загрузить реестр и включить резервную копию, добавьте ключ GitHub в «Профиле».</div></div>` : ''}`; }
 function scale(rg, w, m = {}) { if (!rg || w == null) return ''; const mn = Math.min(rg.lo, w) - 4, mx = Math.max(rg.hi, w) + 4, p = x => (x - mn) / (mx - mn) * 100;
   const ks = m.kind === 'edge' ? 'border-color:#AF9664;box-shadow:0 0 0 3px rgba(175,150,100,.25)' : m.kind === 'near' ? 'border-color:#686868;background:#f2f2f2' : '';
-  return `<div class="scale"><div class="t"></div><div class="a" style="left:${p(rg.lo)}%;width:${Math.max(p(rg.hi) - p(rg.lo), 1.5)}%"></div><div class="k" style="left:${p(w)}%;${ks}"></div><span class="n" style="left:${p(rg.lo)}%">${fg(rg.lo)}</span>${rg.hi !== rg.lo ? `<span class="n" style="left:${p(rg.hi)}%">${fg(rg.hi)}</span>` : ''}${m.kind === 'near' ? `<span class="n" style="left:${p(w)}%;top:-13px;color:#686868;font-weight:700">${m.dev > 0 ? '+' : '−'}${fg(Math.abs(m.dev))} г</span>` : ''}</div>`; }
-const mBadge = m => m.kind === 'edge' ? `<div style="margin-top:4px"><span class="bdg">${esc(T.rod_card.on_edge)}</span></div>` : m.kind === 'near' ? `<div style="margin-top:4px"><span class="chip o">${esc(T.rod_card.fallback_weight)} · ${m.dev > 0 ? '+' : '−'}${fg(Math.abs(m.dev))} г</span><div class="mut" style="font-size:10.5px;margin-top:3px">${esc(T.rod_card.fallback_weight_hint)}</div></div>` : m.lvl === 'fb' ? `<div style="margin-top:4px"><span class="chip o">${m.kind === 'cls' ? esc(T.rod_card.fallback) : 'Запасной вариант' + (m.why ? ': ' + esc(m.why) : '')}</span>${m.kind === 'cls' ? `<div class="mut" style="font-size:10.5px;margin-top:3px">${esc(T.rod_card.fallback_hint)}</div>` : ''}</div>` : m.why ? `<div class="mut" style="font-size:11px">${esc(m.why)}</div>` : '';
+  return `<div class="scale"><div class="t"></div><div class="a" style="left:${p(rg.lo)}%;width:${Math.max(p(rg.hi) - p(rg.lo), 1.5)}%"></div><div class="k" style="left:${p(w)}%;${ks}"></div><span class="n" style="left:${p(rg.lo)}%">${fg(rg.lo)}</span>${rg.hi !== rg.lo ? `<span class="n" style="left:${p(rg.hi)}%">${fg(rg.hi)}</span>` : ''}${m.kind === 'near' ? `<span class="n" style="left:${p(w)}%;top:-13px;color:#686868;font-weight:700">${m.devTxt}</span>` : ''}</div>`; }
+const mBadge = m => m.kind === 'edge' ? `<div style="margin-top:4px"><span class="bdg">${esc(T.rod_card.on_edge)}</span></div>` : m.kind === 'near' ? `<div style="margin-top:4px"><span class="chip o">${esc(T.rod_card.fallback_weight)} · ${m.devTxt}</span><div class="mut" style="font-size:10.5px;margin-top:3px">${esc(T.rod_card.fallback_weight_hint)}</div></div>` : m.lvl === 'fb' ? `<div style="margin-top:4px"><span class="chip o">${m.kind === 'cls' ? esc(T.rod_card.fallback) : 'Запасной вариант' + (m.why ? ': ' + esc(m.why) : '')}</span>${m.kind === 'cls' ? `<div class="mut" style="font-size:10.5px;margin-top:3px">${esc(T.rod_card.fallback_hint)}</div>` : ''}</div>` : m.why ? `<div class="mut" style="font-size:11px">${esc(m.why)}</div>` : '';
 function lineRow(l, m) { return `<button class="card" style="width:100%;text-align:left;display:block" data-open="line:${l.id}"><div class="row"><span style="font-size:13px;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><span class="ey" style="font-size:9.5px;color:var(--green)">${esc(TL(l.type))}</span> ${esc(name(l))}</span><span style="font-size:12.5px;white-space:nowrap"><b>${fg(m.w)} г</b> <span class="mut" style="font-size:11px">${Math.round(m.w * GR)} gr</span></span></div>
   ${m.tip ? `<div class="mut" style="font-size:11px">голова + конец ${esc(m.tip.name || '')}</div>` : ''}${m.rg ? scale(m.rg, m.w, m) : ''}${mBadge(m)}</button>`; }
 function rodExp(r) { const ls = rodLines(r), rs = rodReels(r);
