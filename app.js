@@ -122,7 +122,7 @@ function matchLine(r, l) { /* → null | {lvl:'ok'|'fb', kind, w, tip, rg, why, 
   const lc = l.cls || clsOf(l.class); if (r.cls && lc && lc[0] <= r.cls[1] && lc[1] >= r.cls[0]) return {lvl: 'fb', kind: 'cls', w: lineG(l), why: T.rod_card.fallback}; return null; }
 function clsOf(s) { const n = (String(s || '').match(/\d+/g) || []).map(Number); return n.length ? [Math.min(...n), Math.max(...n)] : null; }
 const rodLines = r => S.lines.map(l => ({l, m: matchLine(r, l)})).filter(x => x.m).sort((a, b) => RANK[a.m.kind] - RANK[b.m.kind] || a.m.w - b.m.w);
-function rodReels(r) { return S.reels.filter(x => !x.hand || x.hand === 'both' || x.hand === hand(r)).map(x => { const c = x.cls; if (c && r.cls) return c[0] <= r.cls[1] && (c[1] == null || c[1] >= r.cls[0]) ? {x, lvl: 'ok'} : null; return {x, lvl: 'fb', why: 'класс катушки не указан'}; }).filter(Boolean); }
+function rodReels(r) { return S.reels.filter(x => !x.rods || x.rods.includes(r.id)).filter(x => x.rods || !x.hand || x.hand === 'both' || x.hand === hand(r)).map(x => { const c = x.cls; if (x.rods) return {x, lvl: 'ok'}; if (c && r.cls) return c[0] <= r.cls[1] && (c[1] == null || c[1] >= r.cls[0]) ? {x, lvl: 'ok'} : null; return {x, lvl: 'fb', why: 'класс катушки не указан'}; }).filter(Boolean); }
 const lineRods = l => S.rods.map(r => ({r, m: matchLine(r, l)})).filter(x => x.m).sort((a, b) => RANK[a.m.kind] - RANK[b.m.kind]);
 /* ---------- вид (v7 «Телеметрия») ---------- */
 let VIEW = {t: 'list', k: 'rods', root: 'rods', tab: 'double'}, OPEN = null; const HIST = [];
