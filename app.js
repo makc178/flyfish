@@ -119,9 +119,12 @@ function matchLine(r, l) { /* → null | {lvl:'ok'|'fb', kind, w, tip, rg, why, 
         why: kind === 'near' ? T.rod_card.fallback_weight : body ? 'вес тела без сменного конца' : c.noTip ? 'без учёта сменного конца' : ''};
       if (!best || RANK[m.kind] < RANK[best.kind]) best = m; }
     return best; }
-  const lc = l.cls || clsOf(l.class); if (r.cls && lc && lc[0] <= r.cls[1] && lc[1] >= r.cls[0]) return {lvl: 'fb', kind: 'cls', w: lineG(l), why: T.rod_card.fallback}; return null; }
+  const lc = l.cls || clsOf(l.class); if (!(r.cls && lc && lc[0] <= r.cls[1] && lc[1] >= r.cls[0])) return null;
+  /* одноручные: основной подбор по классу AFTM (#4 ↔ WF4); у двуручных класс — только запасной вариант */
+  if (hand(r) === 'single') return {lvl: 'ok', kind: 'ok', w: lineG(l), why: ''};
+  return {lvl: 'fb', kind: 'cls', w: lineG(l), why: T.rod_card.fallback}; }
 function clsOf(s) { const n = (String(s || '').match(/\d+/g) || []).map(Number); return n.length ? [Math.min(...n), Math.max(...n)] : null; }
-const rodLines = r => S.lines.map(l => ({l, m: matchLine(r, l)})).filter(x => x.m).sort((a, b) => RANK[a.m.kind] - RANK[b.m.kind] || a.m.w - b.m.w);
+const rodLines = r => S.lines.map(l => ({l, m: matchLine(r, l)})).filter(x => x.m).sort((a, b) => RANK[a.m.kind] - RANK[b.m.kind] || (a.m.w ?? 0) - (b.m.w ?? 0));
 function rodReels(r) { return S.reels.filter(x => !x.rods || x.rods.includes(r.id)).filter(x => x.rods || !x.hand || x.hand === 'both' || x.hand === hand(r)).map(x => { const c = x.cls; if (x.rods) return {x, lvl: 'ok'}; if (c && r.cls) return c[0] <= r.cls[1] && (c[1] == null || c[1] >= r.cls[0]) ? {x, lvl: 'ok'} : null; return {x, lvl: 'fb', why: 'класс катушки не указан'}; }).filter(Boolean); }
 const lineRods = l => S.rods.map(r => ({r, m: matchLine(r, l)})).filter(x => x.m).sort((a, b) => RANK[a.m.kind] - RANK[b.m.kind]);
 /* ---------- вид (v7 «Телеметрия») ---------- */
@@ -206,7 +209,7 @@ function scale(rg, w, m = {}) { if (!rg || w == null) return ''; const mn = Math
 const stChip = (m, rg = m.rg) => { const k = rg && apxOf(rg), s = stOf(m); return k ? `<span class="st s-${s}" data-hint="${esc(APX[k])}" title="${esc(APX[k])}">≈ ${esc(stLbl(m))}</span>` : chip(s, stLbl(m)); };
 const mBadge = (m, small) => `<div class="bdgs">${stChip(m)}</div>${!small && mNote(m) ? `<div class="mut sm2" style="margin-top:4px">${esc(mNote(m))}</div>` : ''}`;
 function lineRow(l, m, full, ic) { const s = stOf(m); full = 0;
-  return `<button class="lr" data-open="line:${l.id}">${ic ? coil(s) : `<span class="dot" style="background:${SC[s]}"></span>`}<div style="flex:1;min-width:0"><div class="t">${esc(sname(l))}</div><div class="mono mut sm">${esc(TL(l.type))} · ${fg(m.w)} г · ${Math.round(m.w * GR)} gr${m.tip ? ' · + ' + esc(m.tip.name || 'конец') : ''}</div>${full && mNote(m) ? `<div class="mut sm2" style="margin-top:2px">${esc(mNote(m))}</div>` : ''}</div><div class="bdgs r">${stChip(m)}</div></button>`; }
+  return `<button class="lr" data-open="line:${l.id}">${ic ? coil(s) : `<span class="dot" style="background:${SC[s]}"></span>`}<div style="flex:1;min-width:0"><div class="t">${esc(sname(l))}</div><div class="mono mut sm">${esc(TL(l.type))} ${m.w != null ? ` · ${fg(m.w)} г · ${Math.round(m.w * GR)} gr` : (l.cls ? ' · ' + clsTxt(l.cls) : '')}${m.tip ? ' · + ' + esc(m.tip.name || 'конец') : ''}</div>${full && mNote(m) ? `<div class="mut sm2" style="margin-top:2px">${esc(mNote(m))}</div>` : ''}</div><div class="bdgs r">${stChip(m)}</div></button>`; }
 function reelRow(x) { return `<button class="card row rr" data-open="reel:${x.x.id}"><div class="row" style="gap:12px;min-width:0;flex:1;justify-content:flex-start">${icoBox('reels', 's')}<div class="one"><b>${esc(sname(x.x))}</b> <span class="mut mono sm">${x.x.cls ? clsTxt(x.x.cls) : esc(x.why || '')}</span></div></div>${chip(x.lvl === 'ok' ? 'ok' : 'fb', x.lvl === 'ok' ? 'Подходит' : 'Запасной')}</button>`; }
 /* одинаковые «Подходит» сворачиваются в одну строку */
 function reelsBlock(rs) { if (!rs.length) return '<div class="mut">—</div>'; const ok = rs.filter(x => x.lvl === 'ok'), other = rs.filter(x => x.lvl !== 'ok');
@@ -217,7 +220,7 @@ function rodExp(r) { const ls = rodLines(r), rs = rodReels(r);
   <div class="cap" style="margin:12px 0 6px">${esc(T.list.matching_reels)}</div>${reelsBlock(rs)}<button class="more" data-open="rod:${r.id}">${esc(T.list.more)} ›</button></div>`; }
 function recBlock(r) { return `<div class="card" style="margin-top:12px"><div class="cap">${esc(T.list.line_recommendation)}</div><div class="rec"><b>Scandi</b><span>${win(r, 'scandi', 1)}</span><b>Skagit</b><span>${win(r, 'skagit', 1)}</span>${r.rio ? `<b>RIO</b><span>${esc([r.rio.scandi && 'Scandi ' + r.rio.scandi, r.rio.skagit && 'Skagit ' + r.rio.skagit].filter(Boolean).join('; '))}</span>` : ''}</div>${r.line_note ? `<div class="mut sm2" style="margin-top:8px">${esc(r.line_note)}</div>` : ''}</div>`; }
 function itemHead(k, x) { const sub = k === 'rods' ? `${esc(x.length || '—')} · ${esc(x.class || '—')}` : k === 'reels' ? `${esc(x.size || '')}${x.cls ? (x.size ? ' · ' : '') + clsTxt(x.cls) : ''}` : `${esc(TL(x.type))}`;
-  const line2 = k === 'rods' ? `S ${winShort(x.scandi_g)} · K ${winShort(x.skagit_g)}` : k === 'reels' ? (x.weight_g != null ? fg(x.weight_g) + ' г · ' : '') + (x.hand === 'both' ? T.tabs.both : x.hand === 'single' ? T.tabs.single : x.hand === 'double' ? T.tabs.double : 'назначение не указано') : `${lineG(x) != null ? fg(lineG(x)) + ' г · ' + Math.round(x.w_gr || lineG(x) * GR) + ' gr' : esc(x.w_raw || '')}${x.float ? ' · ' + esc(x.float) : ''}${x.has_tips ? ' · сменные концы' : ''}`;
+  const line2 = k === 'rods' ? (hand(x) === 'single' && !x.scandi_g && !x.skagit_g ? `подбор по классу ${x.cls ? clsTxt(x.cls) : '—'}` : `S ${winShort(x.scandi_g)} · K ${winShort(x.skagit_g)}`) : k === 'reels' ? (x.weight_g != null ? fg(x.weight_g) + ' г · ' : '') + (x.hand === 'both' ? T.tabs.both : x.hand === 'single' ? T.tabs.single : x.hand === 'double' ? T.tabs.double : 'назначение не указано') : `${lineG(x) != null ? fg(lineG(x)) + ' г · ' + Math.round(x.w_gr || lineG(x) * GR) + ' gr' : esc(x.w_raw || '')}${x.float ? ' · ' + esc(x.float) : ''}${x.has_tips ? ' · сменные концы' : ''}`;
   return `<div class="hd" data-tog="${x.id}" role="button" tabindex="0" aria-expanded="${OPEN === x.id}">${icoBox(k)}<div style="flex:1;min-width:0"><div class="t">${esc(sname(x))}</div><div class="mono mut sm">${sub}</div><div class="mono sm3" style="margin-top:2px">${line2}</div></div><span class="tg ${OPEN === x.id ? 'on' : ''}" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></div>`; }
 function reelExp(x) { const rods = S.rods.filter(r => rodReels(r).some(y => y.x.id === x.id && y.lvl === 'ok'));
   return `<div class="exp"><div class="cap" style="margin-bottom:4px">Подходящие удилища</div>${rods.length ? rods.map(r => `<button class="lr" data-open="rod:${r.id}"><span class="dot" style="background:${SC.ok}"></span><div style="flex:1"><div class="t">${esc(sname(r))}</div><div class="mono mut sm">${esc(r.class || '')}</div></div>${chip('ok', 'Подходит')}</button>`).join('') : `<div class="mut">${x.cls ? '—' : 'Укажите классы катушки, и подбор заработает'}</div>`}
@@ -246,7 +249,9 @@ function filterDefs(k, all) { const D = [], maker = {key: 'maker', label: FT.mak
   return D.filter(d => d.opts.length > 1 || (VIEW.f || {})[d.key]); }
 const passF = (defs, x) => defs.every(d => { const v = (VIEW.f || {})[d.key]; return !v || d.val(x).includes(v); });
 function filtersBar(defs) { const f = VIEW.f || {}, on = Object.values(f).some(Boolean); if (!defs.length) return '';
-  return `<div class="flts">${defs.map(d => `<div class="flt"><span class="cap">${esc(d.label)}</span><div class="hs fopts">${[null, ...d.opts].map(v => `<button class="fo ${(f[d.key] || null) === v ? 'on' : ''}" data-fk="${d.key}" data-fv="${esc(v ?? '')}">${esc(v ?? FT.all)}</button>`).join('')}</div></div>`).join('')}${on ? `<button class="lnk ac" data-freset>${esc(FT.reset)}</button>` : ''}</div>`; }
+  const open = defs.find(d => d.key === VIEW.fo);
+  return `<div class="hs fbar">${defs.map(d => `<button class="fc ${f[d.key] ? 'on' : ''}" data-fopen="${d.key}" aria-haspopup="dialog">${esc(f[d.key] || d.label)} ▾</button>`).join('')}${on ? `<button class="fc rs" data-freset>${esc(FT.reset)}</button>` : ''}</div>`
+   + (open ? `<div class="fsh-bg" data-fclose></div><div class="fsh" role="dialog" aria-label="${esc(open.label)}"><div class="row"><b>${esc(open.label)}</b><button class="lnk" data-fclose aria-label="Закрыть">✕</button></div><div class="fvals">${[null, ...open.opts].map(v => `<button class="fo ${(f[open.key] || null) === v ? 'on' : ''}" data-fk="${open.key}" data-fv="${esc(v ?? '')}">${esc(v ?? FT.all)}</button>`).join('')}</div></div>` : ''); }
 function list(k) { const tab = VIEW.tab || 'double', all = S[k], xs = all.filter(x => inTab(k, x, tab)), defs = filterDefs(k, xs), fx = xs.filter(x => passF(defs, x));
   return `<div class="w top"><div class="row"><button class="av" data-tab="profile" aria-label="Профиль">${ICO.user}</button><span class="mono mut sm">${esc(syncTxt())}</span><button class="pill ac" data-new="${k}">${ICO.plus}${esc(T.list.add)}</button></div>
   <div class="row" style="margin-top:14px;align-items:flex-end"><h1 class="h1">${esc(SEC[k])}</h1><span class="mut sm2" style="white-space:nowrap">${esc(T.list.count.replace('{n}', all.length))}</span></div>
@@ -365,9 +370,11 @@ function bind() {
     if (d.add != null) return go({t: 'add', root: VIEW.root || VIEW.t});
     if (d.sel) { VIEW.sel = d.sel; return render(); }
     if (d.reels != null) { VIEW.reels = d.reels === '1'; return render(); }
-    if (d.tab2) { VIEW.tab = d.tab2; VIEW.f = {}; OPEN = null; return render(); }
-    if (d.fk) { VIEW.f = {...(VIEW.f || {}), [d.fk]: d.fv || null}; OPEN = null; return render(); }
-    if (d.freset != null) { VIEW.f = {}; return render(); }
+    if (d.tab2) { VIEW.tab = d.tab2; VIEW.f = {}; VIEW.fo = null; OPEN = null; return render(); }
+    if (d.fopen) { VIEW.fo = VIEW.fo === d.fopen ? null : d.fopen; return render(); }
+    if (d.fclose != null && !t.closest('.fsh .fvals')) { VIEW.fo = null; return render(); }
+    if (d.fk) { VIEW.f = {...(VIEW.f || {}), [d.fk]: d.fv || null}; VIEW.fo = null; OPEN = null; return render(); }
+    if (d.freset != null) { VIEW.f = {}; VIEW.fo = null; return render(); }
     if (d.tog) { OPEN = OPEN === d.tog ? null : d.tog; return render(); }
     if (d.open) { const [k, ...id] = d.open.split(':'); return go({t: k, id: id.join(':'), root: VIEW.root || VIEW.t}); }
     if (d.new) { const tab = VIEW.tab || 'double'; DRAFT = {tips: [], type: d.new === 'lines' ? 'scandi' : d.new === 'rods' ? tab : undefined, hand: d.new === 'reels' ? null : d.new === 'lines' ? tab : undefined}; return go({t: 'form', k: d.new, root: VIEW.root || 'rods'}); }
