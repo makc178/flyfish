@@ -172,7 +172,7 @@ const chip = (s, t) => `<span class="st s-${s}">${esc(t)}</span>`;
 const apxBtn = (k, short) => `<button class="st s-apx" data-hint="${esc(APX[k])}" aria-label="${esc(T.rod_card.approx_window)}: подсказка">≈ ${esc(T.rod_card.approx_window)}${short ? '' : ' <i>i</i>'}</button>`;
 const mNote = m => m.kind === 'near' ? T.rod_card.fallback_weight_hint : m.kind === 'cls' ? T.rod_card.fallback_hint : m.lvl === 'fb' && m.why ? m.why : m.why || '';
 const TABS = ['rods', 'reels', 'lines'];
-const tb = () => { const r = VIEW.root || VIEW.k; return `<nav class="tb" aria-label="Навигация">${TABS.map(k => `<button data-tab="${k}" class="${r === k ? 'on' : ''}">${esc(T.tabbar[k])}</button>`).join('')}</nav>`; };
+const tb = () => { const r = VIEW.root || VIEW.k; return `<nav class="tb" aria-label="Навигация">${TABS.map(k => `<button data-tab="${k}" class="${r === k ? 'on' : ''}"><span class="tp"><img src="${ART[k]}" alt="" class="tp-${k}"></span><span class="tl">${esc(T.tabbar[k])}</span></button>`).join('')}</nav>`; };
 function render() { const v = VIEW;
   let h = v.t === 'list' ? list(v.k) : v.t === 'rod' ? rodCard(byId('rods', v.id)) : v.t === 'reel' ? reelCard(byId('reels', v.id)) : v.t === 'line' ? lineCard(byId('lines', v.id)) : v.t === 'form' ? form(v) : v.t === 'add' ? addStep() : v.t === 'pick' ? pick() : profile();
   app().innerHTML = (h + (v.t === 'form' || v.t === 'add' ? '' : tb())).replace(/(\d) (г|gr|м|колен|€)(?=[\s<·,.;)]|$)/g, '$1\u00a0$2'); bind();
@@ -268,7 +268,7 @@ const srcLinks = src => { const us = [...new Set((String(src || '').match(/https
   return a.length ? `<div class="mut sm2" style="margin-top:10px">Источник: ${a.join(' ')}</div>` : ''; };
 const noteBlock = x => x.note ? `<div class="mut" style="margin-top:12px">${esc(x.note)}</div>` : '';
 const delBtn = (k, x) => `<button class="btn r" style="margin-top:22px" data-del="${k}:${x.id}">${esc(T.rod_card.delete)}</button>`;
-const titleBlock = (cap, x) => `<div class="cap mono">${cap}</div><h1 class="h1 big2">${esc(x.model || '')}</h1>`;
+const titleBlock = (cap, x) => `<div class="cap mono">${cap}</div><h1 class="h1 big2" title="${esc(name(x))}">${esc(sname(x))}</h1>`;
 function rodCard(r) { const ls = rodLines(r), rs = rodReels(r);
   return cardTop('rods', r) + `<div class="w ctxt">${titleBlock(`${esc(r.brand || '')} · ${RT[r.type] || ''}`, r)}${stats([['Длина', esc(r.length || '—')], ['Класс', esc(r.class || '—')], ['Колен', r.pieces ? esc(r.pieces) + ' колен' : ''], ['Вес', r.weight_g ? fg(r.weight_g) + ' г' : '']])}
   <div class="card gcard">${gaugesFor(r, ls) || `<div class="mut">Окна Scandi и Skagit не указаны</div>`}</div>
