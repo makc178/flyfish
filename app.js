@@ -223,13 +223,13 @@ function list(k) { const tab = VIEW.tab || 'double', all = S[k], xs = all.filter
   <div class="w" style="margin-top:14px">${fx.length ? fx.map(x => `<div class="it">${itemHead(k, x)}${OPEN === x.id ? (k === 'rods' ? rodExp(x) : k === 'reels' ? reelExp(x) : lineExp(x)) : ''}</div>`).join('') : emptyBox(k)}</div>`; }
 function emptyBox(k) { return `<div class="empty"><div class="eph">${artBox(k)}</div><div class="h2" style="line-height:1.3">${esc(T.empty[k])}</div><button class="btn" style="margin-top:20px" data-new="${k}">+ ${esc(T.empty.button)}</button></div>`; }
 function cardTop(k, x) { return `<div class="chero ${k}"><div class="glow"></div>${artBox(k, k === 'rods' ? 'inset:40px -30px 50px -20px;background-size:contain' : 'inset:70px 25% 40px;background-size:contain')}<div class="w row top" style="position:relative"><button class="cb" data-back aria-label="Назад">${ICO.back}</button><button class="pill" data-edit="${k}:${x.id}">${esc(T.rod_card.edit)}</button></div></div>`; }
-const stats = a => `<div class="mono specs">${a.filter(([, v]) => v && v !== '—').map(([s, v]) => `<span title="${esc(s)}">${v}</span>`).join('')}</div>`;
+const stats = a => `<div class="mono specs">${a.filter(([, v]) => v && v !== '—').map(([s, v]) => `<span title="${esc(s)}">${v}</span>`).join('<span aria-hidden="true">·</span>')}</div>`;
 const buyBlock = x => x.buy && Object.keys(x.buy).length ? `<div class="card" style="margin-top:12px"><div class="cap">Покупка</div><div class="mut sm2" style="margin-top:4px">${[x.buy.date, x.buy.shop, x.buy.price_eur != null ? String(x.buy.price_eur).replace('.', ',') + ' € без НДС' : ''].filter(Boolean).map(esc).join(' · ')}</div></div>` : '';
 const noteBlock = x => x.note ? `<div class="mut" style="margin-top:12px">${esc(x.note)}</div>` : '';
 const delBtn = (k, x) => `<button class="btn r" style="margin-top:22px" data-del="${k}:${x.id}">${esc(T.rod_card.delete)}</button>`;
 const titleBlock = (cap, x) => `<div class="cap mono">${cap}</div><h1 class="h1 big2">${esc(x.model || '')}</h1>`;
 function rodCard(r) { const ls = rodLines(r), rs = rodReels(r);
-  return cardTop('rods', r) + `<div class="w ctxt">${titleBlock(`${esc(r.brand || '')} · ${RT[r.type] || ''}`, r)}${stats([['Длина', esc(r.length || '—')], ['Класс', esc(r.class || '—')]])}
+  return cardTop('rods', r) + `<div class="w ctxt">${titleBlock(`${esc(r.brand || '')} · ${RT[r.type] || ''}`, r)}${stats([['Длина', esc(r.length || '—')], ['Класс', esc(r.class || '—')], ['Колен', r.pieces ? esc(r.pieces) + ' колен' : ''], ['Вес', r.weight_g ? fg(r.weight_g) + ' г' : '']])}
   <div class="card gcard">${gaugesFor(r, ls) || `<div class="mut">Окна Scandi и Skagit не указаны</div>`}</div>
   <div class="row" style="margin-top:20px"><h2 class="h2">${esc(T.rod_card.matches_title)}</h2><span class="mut mono">${ls.length}</span></div>
   ${ls.length ? ls.map(x => lineRow(x.l, x.m)).join('') : `<div class="mut">${esc(T.empty.no_match)}</div>`}
