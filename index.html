@@ -9,7 +9,7 @@
 :root{--bg:#0C0F12;--card:#161A1F;--ln:#262C35;--tx:#F4F6F8;--mut:#9AA4B0;--ac:#FF6B4A;--ok:#3DDC97;--edge:#FFD166;--fb:#FF6B4A;--apx:#9AA4B2;--mono:'Geist Mono',ui-monospace,monospace}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg);-webkit-text-size-adjust:100%}
-body{min-height:100vh;color:var(--tx);font-family:Geist,system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:var(--bg);padding-bottom:calc(112px + env(safe-area-inset-bottom));font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;overflow-x:hidden}
+body{min-height:100vh;color:var(--tx);font-family:Geist,system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:var(--bg);padding-bottom:calc(124px + env(safe-area-inset-bottom));font-size:16px;line-height:1.45;font-variant-numeric:tabular-nums;overflow-x:hidden}
 #app{max-width:520px;margin:0 auto;overflow-x:clip}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}input,select,textarea{font:inherit;color:inherit}
 .mono{font-family:var(--mono);letter-spacing:-.2px}
@@ -46,7 +46,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}input,
 button.st{min-height:32px}
 .s-ok{background:rgba(61,220,151,.14);color:var(--ok)}.s-edge{background:rgba(255,209,102,.14);color:var(--edge)}.s-fb{background:rgba(255,107,74,.15);color:#FF8466}.s-apx{background:rgba(154,164,178,.16);color:#B4BCC7}
 .bdgs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.bdgs.r{margin:0;flex:none;flex-direction:column;align-items:flex-end;max-width:52%}.bdgs.r .st{white-space:normal;text-align:right}
-.tb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));height:60px;border-radius:30px;background:rgba(30,35,42,.86);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);border:1px solid #2C333C;box-shadow:0 12px 30px rgba(0,0,0,.55);display:flex;align-items:center;padding:6px;gap:4px;z-index:20}
+.tb{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));height:60px;border-radius:30px;background:rgba(30,35,42,.95);backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);border:1px solid #2C333C;box-shadow:0 12px 30px rgba(0,0,0,.55);display:flex;align-items:center;padding:6px;gap:4px;z-index:20}
 .tb button{height:48px;min-width:48px;padding:0 22px;border-radius:24px;font-size:16px;font-weight:600;color:var(--mut);display:flex;align-items:center;justify-content:center}.tb button.ic{padding:0 14px}.tb .on{background:var(--tx);color:var(--bg)}
 .btn{display:block;width:100%;min-height:52px;background:var(--ac);color:#0C0F12;border-radius:16px;text-align:center;padding:14px;font-weight:700;font-size:16px}
 .btn.l{background:var(--card);color:var(--tx);border:1px solid var(--ln)}.btn.r{background:transparent;color:#FF8466;border:1px solid rgba(255,107,74,.45)}
@@ -96,4 +96,13 @@ button:active,.apx:active{opacity:.75}
 .chero .cb{background:rgba(255,255,255,.1);border:0}.chero .pill{background:rgba(255,255,255,.1);border:0;backdrop-filter:none}
 .cap.mono{font-family:var(--mono);letter-spacing:.6px}.specs span{color:var(--mut)}
 .pr .lr{padding:12px}
+.card.row{display:flex}.kind{align-items:center;min-height:68px;padding:10px 12px}.chev{flex:none;align-self:center;color:var(--mut);font-size:22px;line-height:1;padding-left:4px}
+.thumb.ico{display:flex;align-items:center;justify-content:center;background:#1F242B}.thumb.ico.s{width:40px;height:40px;border-radius:11px}
+.one{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rr .one b{font-weight:600}
+.rr{align-items:center}.rr>.st{flex:none}
+.sk{flex:none;display:grid;grid-template-columns:84px 100px;gap:6px;text-align:left}.apxc{color:var(--apx);font-weight:700}
+.src{color:var(--ac);font-weight:600;text-decoration:none;margin-right:10px;white-space:nowrap}
+.it,.card{overflow:hidden}.bdgs .st,.bdgs.r .st{max-width:100%;white-space:normal}
+.tg svg{transition:transform .15s}.tg.on{background:#2C333C;color:var(--tx);border-color:#3A424C}.tg.on svg{transform:rotate(180deg)}
+.rchip{max-width:200px}
 </style></head><body><div id="app"></div><script src="app.js"></script></body></html>
