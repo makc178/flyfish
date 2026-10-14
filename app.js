@@ -37,7 +37,7 @@ async function save(local) { S.updated = Date.now(); await idb.set('state', {sal
 /* ---------- PIN ---------- */
 let pinBuf = '', pinMode = 'unlock', pinFirst = '', pinBusy = false, RESTORE = null;
 /* автообновление: сверяем сборку с version.json (без кэша); новая версия — перезагрузка, кроме открытой формы */
-const BUILD = '50a45ef19c', BUILT = '2026-10-14T07:27Z';
+const BUILD = 'f740e26c61', BUILT = '2026-10-14T07:29Z';
 async function checkUpdate() { try { const j = await (await fetch('version.json?t=' + Date.now(), {cache: 'no-store'})).json();
   if (j.v && j.v !== BUILD && String(j.built || '') > BUILT && VIEW.t !== 'form' && sessionStorage.getItem('ff-upd') !== j.v) { sessionStorage.setItem('ff-upd', j.v); const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); location.replace(location.pathname + '?v=' + j.v); } } catch (e) {} }
 async function boot() {
@@ -168,13 +168,12 @@ const TL = t => T.line_types[t] || (t === 'tip' ? 'Сменный конец' : 
 const RT = {single: 'одноручное', double: 'двуручное', switch: 'свитч'};
 const inTab = (k, x, tab) => k === 'rods' ? hand(x) === tab : (!x.hand || x.hand === 'both' || x.hand === tab);
 const rng = (g, gr) => g ? `${g.approx && g.lo === g.hi ? '≈' : ''}${fg(g.lo)}${g.hi !== g.lo ? '–' + fg(g.hi) : ''} г${gr ? ` · ${gr.approx && gr.lo === gr.hi ? '≈' : ''}${Math.round(gr.lo)}${gr.hi !== gr.lo ? '–' + Math.round(gr.hi) : ''} gr` : ''}` : '—';
-const name = x => `${x.brand ? x.brand + ' ' : ''}${x.model}`;
+const name = x => sname(x);
 /* короткое имя для списков, графика и карусели; полное — только в карточке */
 const STOPW = new Set(['signature', 'shooting', 'head', 'integrated', 'double', 'handed', 'fly', 'rod', 'colors', 'of', 'the', 'wild']);
 const FLT = f => /^плав|^float/i.test(f || '') ? 'F' : /^тон|^sink/i.test(f || '') ? 'S' : /^(инт|int)/i.test(f || '') ? 'I' : '';
-function sname(x) { const w = String(x.model || '').split(/\s+/).filter(t => t && !STOPW.has(t.toLowerCase())); let s = w.join(' ') || x.model || '';
-  if (!/[A-Za-zА-Яа-яЁё]/.test(s) && x.brand) s = x.brand + ' ' + s;
-  const f = x.type && x.type !== 'tip' && w.length < String(x.model || '').split(/\s+/).length ? FLT(x.float) : ''; return f ? s + ' ' + f : s; }
+/* полное имя «Производитель Модель» как в таблице, без сокращений; бренд не дублируется, если модель уже с него начинается */
+function sname(x) { const b = String(x.brand || '').trim(), m = String(x.model || '').trim(); return b && !m.toLowerCase().startsWith(b.toLowerCase()) ? `${b} ${m}` : (m || b); }
 const plural = (n, a, b, c) => { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c; };
 const GC = {rods: '#E9EEF2', lines: '#7F95A8', reels: '#C9D1DA'};
 const GL = {rods: '<path d="M4 20 19.5 4.5"/><path d="M6.5 17.5l-1.6-1.6M17 7l1.8 1.8"/><circle cx="7.2" cy="16.8" r="1.4"/>',
