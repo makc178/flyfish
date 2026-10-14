@@ -206,4 +206,23 @@ body{padding-bottom:calc(64px + 24px + env(safe-area-inset-bottom))}
 .pin.ok .crest{animation:crOk .25s ease-out}@keyframes crOk{50%{filter:drop-shadow(0 0 14px rgba(191,230,242,.9)) brightness(1.08)}}
 .pin .crest+.dots{margin-top:24px}.pin.bad .crest,.pin.bad .dots{animation:crSh .4s ease-in-out}@keyframes crSh{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.pin .crest{animation:crIn .4s ease-out both}.pin .crest.seen,.pin.ok .crest,.pin .crest+.dots{margin-top:24px}.pin.bad .crest,.pin.bad .dots{animation:none}}
-</style></head><body><div id="app"></div><script src="app.js?v=f926bbdb6e"></script></body></html>
+
+/* верхняя часть списков (14.10, спец. Дизайнера) */
+.lw{display:contents}.ltop{position:sticky;top:0;z-index:20;margin:0;padding:0 18px 8px;background:rgba(19,35,43,.82);backdrop-filter:blur(18px) saturate(1.2);-webkit-backdrop-filter:blur(18px) saturate(1.2)}
+.lhd{min-height:0;padding-top:calc(env(safe-area-inset-top) + 8px);display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative}
+.lhd .ltb{min-width:0;display:flex;flex-direction:column}
+.lhd .lt{font-size:28px;font-weight:700;letter-spacing:-.4px;line-height:1.1;white-space:normal;text-wrap:balance;transition:font-size .2s}
+.lhd .cnt{font-size:13px;line-height:18px;color:var(--mut);white-space:nowrap;margin-top:2px}
+.lhd .rt{gap:8px}
+.ltop .seg.full{margin-top:12px;height:36px}
+.ltop .fbar{margin:10px -18px 0;padding:0 18px;height:32px;gap:8px;overflow-x:auto;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+
+.ltop .fc{height:32px;min-height:32px;padding:0 11px;border-radius:16px;font-size:14px;gap:4px;flex:none}
+.ltop .fc .cv{font-style:normal;font-size:10px;opacity:.7}
+@media (max-width:380px){.ltop .fc{padding:0 10px;font-size:13.5px}.ltop .fbar{gap:6px}}
+body.scd .lhd{padding-top:calc(env(safe-area-inset-top) + 6px);min-height:44px;justify-content:flex-end}
+body.scd .lhd .ltb{position:absolute;left:96px;right:96px;bottom:0;top:calc(env(safe-area-inset-top) + 6px);align-items:center;justify-content:center}
+body.scd .lhd .lt{font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+body.scd .lhd .cnt{display:none}
+body.scd .lhd .av,body.scd .lhd .plus{width:36px;height:36px;min-width:36px;min-height:36px}
+</style></head><body><div id="app"></div><script src="app.js?v=e30e530f26"></script></body></html>
