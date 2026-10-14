@@ -201,7 +201,7 @@ const stLbl = m => m.need ? (T.rod_card.status_need_tip || CFG.needTip) : m.kind
 const coil = () => icoBox('lines', 's');
 const chip = (s, t) => `<span class="st s-${s}">${esc(t)}</span>`;
 const apxBtn = (k, short) => `<button class="st s-apx" data-hint="${esc(APX[k])}" aria-label="${esc(T.rod_card.approx_window)}: подсказка">≈ ${esc(T.rod_card.approx_window)}${short ? '' : ' <i>i</i>'}</button>`;
-const mNote = m => m.kind === 'near' ? T.rod_card.fallback_weight_hint : m.kind === 'cls' ? T.rod_card.fallback_hint : m.lvl === 'fb' && m.why ? m.why : m.why || '';
+const mNote = m => m.need ? '' : m.kind === 'near' ? T.rod_card.fallback_weight_hint : m.kind === 'cls' ? T.rod_card.fallback_hint : m.lvl === 'fb' && m.why ? m.why : m.why || '';
 const TABS = ['rods', 'reels', 'lines'];
 const tb = () => { const r = VIEW.root || VIEW.k; return `<nav class="tb" aria-label="Навигация">${TABS.map(k => `<button data-tab="${k}" class="${r === k ? 'on' : ''}"><span class="tp">${ic(k)}</span><span class="tl">${esc(T.tabbar[k])}</span></button>`).join('')}</nav>`; };
 function render() { const v = VIEW;
@@ -282,7 +282,7 @@ function sinkChip(v) { if (!v) return '—'; const c = (CFG.sink.find(([re]) => 
 function tipsRow(l) { const ts = (l.tips || []).filter(t => t && (t.name || t.w_g != null)); if (!ts.length || l.type === 'tip') return ''; const C = T.line_card;
   return `<details class="tps"><summary><span class="row" style="gap:8px">${ic('tips', 20)}<span>${esc(C.tips_title)} · ${ts.length}</span></span></summary><table class="tpt"><thead><tr><th>${esc(C.tip_model || 'Модель')}</th><th>${esc(C.tip_length || 'Длина, фт')}</th><th>${esc(C.tip_weight || 'Вес, г')}</th><th>${esc(C.tip_floating || 'Плавучесть')}</th></tr></thead><tbody>${ts.map(t => `<tr><td>${esc(t.name || '—')}</td><td class="mono">${t.len_ft != null ? esc(String(t.len_ft).replace('.', ',')) : t.len ? esc(t.len) + ' м' : '—'}</td><td class="mono">${t.w_g != null && num(t.w_g) != null ? fg(num(t.w_g)) : '—'}</td><td>${sinkChip(t.sink)}</td></tr>`).join('')}</tbody></table></details>`; }
 function lineExp(l) { const rs = lineRods(l);
-  return `<div class="exp"><div class="cap" style="margin-bottom:4px">${esc(T.line_card.fits_rods)}</div>${rs.length ? rs.map(x => `<button class="card blk" style="margin-top:8px" data-open="rod:${x.r.id}"><div class="row"><span class="t">${esc(sname(x.r))}</span><b class="mono sm3">${fg(x.m.v)} ${x.m.u}</b></div>${x.m.rg ? scale(x.m.rg, x.m.v, x.m) : ''}${mBadge(x.m)}</button>`).join('') : `<div class="mut">—</div>`}
+  return `<div class="exp"><div class="cap" style="margin-bottom:4px">${esc(T.line_card.fits_rods)}</div>${rs.length ? rs.map(x => `<button class="card blk" style="margin-top:8px" data-open="rod:${x.r.id}"><div class="row"><span class="t">${esc(sname(x.r))}</span><b class="mono sm3">${x.m.v != null ? fg(x.m.v) + ' ' + x.m.u : ''}</b></div>${x.m.rg ? scale(x.m.rg, x.m.v, x.m) : ''}${mBadge(x.m)}</button>`).join('') : `<div class="mut">—</div>`}
   ${tipsRow(l)}<button class="more" data-open="line:${l.id}">${esc(T.list.more)} ›</button></div>`; }
 /* ---------- фильтры: значения берутся из данных ---------- */
 const FT = T.filters;
