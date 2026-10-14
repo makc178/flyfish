@@ -193,4 +193,17 @@ body{padding-bottom:calc(64px + 24px + env(safe-area-inset-bottom))}
 #app{padding-bottom:calc(64px + 16px + env(safe-area-inset-bottom))}
 .rn{display:flex;flex-direction:column;align-items:center;line-height:1}.rnc{font-family:Geologica,system-ui,sans-serif;font-size:11px;color:var(--mut);margin-top:4px;font-weight:400}
 .it .hd .t,.lr .t,.rcard .t,.rchip .t,.blk .t,.rn1,.pr .t{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere}.rchip .t.one{white-space:normal}
-</style></head><body><div id="app"></div><script src="app.js?v=a64a134403"></script></body></html>
+
+/* v12: карточка удилища */
+.rframe{margin:8px 16px 0;aspect-ratio:16/9;border-radius:16px;background:radial-gradient(70% 70% at 50% 50%,rgba(191,230,242,.12),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.12);overflow:hidden}
+.rart{display:block;width:100%;height:100%}
+.ctxt.rc{margin-top:14px}.rtt .rb{font-weight:300}.rtt .rm{font-weight:700}
+/* v12: герб на экране PIN */
+.pin .crest{width:96px;aspect-ratio:3000/2494;margin:28px auto 0;background:var(--tx);-webkit-mask:url(art/crest.svg) center/contain no-repeat;mask:url(art/crest.svg) center/contain no-repeat;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45));animation:crIn .4s ease-out both,crBr 3s ease-in-out .4s infinite}
+.pin .crest.seen{animation:crBr 3s ease-in-out infinite}
+@keyframes crIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+@keyframes crBr{0%,100%{filter:drop-shadow(0 4px 10px rgba(0,0,0,.45)) brightness(1)}50%{filter:drop-shadow(0 4px 10px rgba(0,0,0,.45)) brightness(.93)}}
+.pin.ok .crest{animation:crOk .25s ease-out}@keyframes crOk{50%{filter:drop-shadow(0 0 14px rgba(191,230,242,.9)) brightness(1.08)}}
+.pin .crest+.dots{margin-top:24px}.pin.bad .crest,.pin.bad .dots{animation:crSh .4s ease-in-out}@keyframes crSh{20%{transform:translateX(-8px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(3px)}}
+@media (prefers-reduced-motion:reduce){.pin .crest{animation:crIn .4s ease-out both}.pin .crest.seen,.pin.ok .crest,.pin .crest+.dots{margin-top:24px}.pin.bad .crest,.pin.bad .dots{animation:none}}
+</style></head><body><div id="app"></div><script src="app.js?v=f926bbdb6e"></script></body></html>
