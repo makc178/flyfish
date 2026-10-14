@@ -161,4 +161,26 @@ body{padding-bottom:calc(132px + env(safe-area-inset-bottom))}
 .lgh{font-size:13px;text-transform:uppercase;letter-spacing:1.4px;font-weight:600;color:var(--ac);margin:18px 4px 8px}.lgh:first-child{margin-top:4px}.lgh.sub{margin:14px 4px 8px 14px;opacity:.8}
 .tps{margin-top:12px;border-top:1px solid var(--ln)}.tps summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--ac)}.tps summary::-webkit-details-marker{display:none}.tps summary:after{content:'›';font-size:18px;transition:transform .15s}.tps[open] summary:after{transform:rotate(90deg)}
 .tpt{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}.tpt th{font-weight:500;color:var(--mut);text-align:left;padding:4px 4px 6px;font-size:12px}.tpt td{padding:7px 4px;border-top:1px solid var(--ln);vertical-align:middle;overflow-wrap:anywhere}.tpt th:first-child,.tpt td:first-child{width:38%}.sk{display:inline-block;padding:2px 8px;border-radius:10px;font-size:12px;font-weight:600;line-height:1.4}
+/* v12: сетка 8px, шапки, нижняя навигация, иконки (Лёд) */
+#app{max-width:640px}.w{padding-left:16px;padding-right:16px}
+.lhd{min-height:56px;padding-top:env(safe-area-inset-top);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lhd .lt{font-size:20px;font-weight:600;letter-spacing:-.2px;line-height:1.2;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lhd .rt{display:flex;align-items:center;gap:8px;flex:none}.lhd .cnt{font-size:13px;color:var(--mut);white-space:nowrap}
+.lhd .av,.lhd .plus{width:40px;height:40px;min-height:40px;min-width:40px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:20px}
+.seg.full{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.seg.full button{height:36px;min-height:36px;padding:0 8px;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:18px;line-height:1}
+.fbar{margin:8px -16px 0;padding:0 16px;height:36px;gap:8px;align-items:center}
+.fc{height:36px;display:inline-flex;align-items:center;gap:8px;padding:0 12px;font-size:14px;line-height:1}
+.ic{flex:none;display:block}
+.it{padding:16px;margin-bottom:12px}.exp{margin:16px -16px 0;padding:16px 16px 0}.card{padding:16px}
+body{padding-bottom:calc(64px + 24px + env(safe-area-inset-bottom))}
+.tb{left:0;right:0;bottom:0;transform:none;width:100%;max-width:none;height:calc(64px + env(safe-area-inset-bottom));padding:0 0 env(safe-area-inset-bottom);border-radius:0;display:grid;grid-template-columns:repeat(3,1fr);border:0;border-top:1px solid rgba(255,255,255,.18);box-shadow:none;background:rgba(19,35,43,.82)}
+.tb button{height:64px;flex-direction:column;gap:4px;font-size:11px;font-weight:500;color:var(--mut);padding:0}
+.tb .tp{width:auto;height:24px;background:none!important;box-shadow:none!important;overflow:visible;border-radius:0}.tb .on{color:var(--ac)}.tb .on .tl{font-weight:600}
+.hsc{margin-bottom:16px}.hsh{display:flex;align-items:baseline;gap:8px;font-size:13px}.hsl{color:var(--mut);text-transform:uppercase;letter-spacing:1px;font-size:12px}.hsh b{font-weight:600}
+.stag{margin-left:auto;font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid var(--ln);color:var(--mut)}
+.hst{position:relative;height:4px;border-radius:2px;background:rgba(255,255,255,.16);margin:12px 0 6px}.hsw{position:absolute;top:-2px;height:8px;border-radius:4px;background:#BFE6F2}.hsw.ap{background:repeating-linear-gradient(90deg,#D4DCE4 0 4px,transparent 4px 7px)}
+.hsd{position:absolute;top:50%;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:5px;border:2px solid #13232B}.hsn{display:flex;justify-content:space-between;font-size:11px;color:var(--mut)}
+.rls{display:flex;flex-direction:column}.rl{display:flex;align-items:center;gap:8px;min-height:40px;border-top:1px solid var(--ln);text-align:left;font-size:14px}.rl .dot{flex:none}
+.rn1{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rw{flex:none;font-size:13px}.rst{flex:none;font-size:12px;width:76px;text-align:right;background:none}.rst.s-ok{color:var(--ok)}.rst.s-edge{color:var(--edge)}.rst.s-fb{color:var(--fb)}
+.it .hd .mono.sm3{white-space:normal;overflow:visible;text-overflow:clip}
 </style></head><body><div id="app"></div><script src="app.js"></script></body></html>
