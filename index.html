@@ -183,4 +183,13 @@ body{padding-bottom:calc(64px + 24px + env(safe-area-inset-bottom))}
 .rls{display:flex;flex-direction:column}.rl{display:flex;align-items:center;gap:8px;min-height:40px;border-top:1px solid var(--ln);text-align:left;font-size:14px}.rl .dot{flex:none}
 .rn1{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rw{flex:none;font-size:13px}.rst{flex:none;font-size:12px;width:76px;text-align:right;background:none}.rst.s-ok{color:var(--ok)}.rst.s-edge{color:var(--edge)}.rst.s-fb{color:var(--fb)}
 .it .hd .mono.sm3{white-space:normal;overflow:visible;text-overflow:clip}
-</style></head><body><div id="app"></div><script src="app.js?v=cd549c192c"></script></body></html>
+/* v13: двухстрочное окно, единый сегмент, сплошная навигация, подпись счётчика */
+.it .hd .mono.sm3 .wl{display:block;white-space:nowrap}
+.it .hd .t{white-space:normal;overflow:visible;text-overflow:clip}
+.seg.full{gap:0;padding:2px;border-radius:18px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);height:36px;box-sizing:border-box}
+.seg.full button{height:30px;min-height:30px;border:0!important;border-radius:16px;background:none!important;box-shadow:none!important;backdrop-filter:none!important;color:var(--mut)}
+.seg.full button.on{background:rgba(255,255,255,.92)!important;color:#16303A}
+.tb{background:#13232B!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;border-radius:0!important;left:0!important;right:0!important;bottom:0!important;width:100%!important;transform:none!important}
+#app{padding-bottom:calc(64px + 16px + env(safe-area-inset-bottom))}
+.rn{display:flex;flex-direction:column;align-items:center;line-height:1}.rnc{font-family:Geologica,system-ui,sans-serif;font-size:11px;color:var(--mut);margin-top:4px;font-weight:400}
+</style></head><body><div id="app"></div><script src="app.js?v=50a45ef19c"></script></body></html>
