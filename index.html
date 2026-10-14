@@ -394,4 +394,34 @@ body.scd .hdr2 .eyb{display:none}body.scd .lhd.hdr2 .lt{font-size:17px!important
 .it .hd .mono,.it .hd .sm3,.stat b,.tsv{font-size:15px;font-weight:500;font-variant-numeric:tabular-nums}.un{opacity:.6;font-weight:400}
 .sumr{display:flex;align-items:center;gap:8px;min-height:40px;border-bottom:1px solid rgba(255,255,255,.08)}.sumn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sumr .lcls{margin-left:0}.kdet summary{cursor:pointer;padding:6px 0}
 .sumh{display:flex;justify-content:space-between;margin-top:14px;padding-bottom:4px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:#D9B86A}.tsum .sumr{min-height:48px;gap:10px}.tsum .sumr .lcls{margin-left:0;min-width:44px;justify-content:center}.lcls.none{visibility:hidden}.sumw{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;border-radius:12px;background:rgba(245,160,74,.12);color:#F5A04A;font-size:13px}.sumw .adot{position:static;flex:none}
-</style></head><body><div id="app"></div><script src="app.js?v=d4cc72aa5d"></script></body></html>
+/* v17: вес в две строки (Дизайнер) */
+.wv{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.15;font-variant-numeric:tabular-nums;white-space:nowrap}.wv .wp{font-size:15px;font-weight:600;color:var(--tx,#fff)}.wv .ws{font-size:13px;font-weight:400;color:var(--mut);margin-top:2px}
+.lmg{grid-template-columns:auto 96px 1fr;column-gap:12px}.lmw{min-width:56px}
+.lr .wv.lrw{flex:none;align-items:flex-end;margin-left:4px}.rbl .wv{flex:none;align-items:flex-end}
+/* v17: строка «Шнур» в карточке катушки */
+.rlrow{margin-top:14px}.rlhd{justify-content:space-between;gap:8px;min-height:24px}.rlbt{gap:4px}.rlact{min-height:44px;padding:0 10px}.rloff{color:var(--mut)!important;font-weight:500}
+.rlrow .rbl{margin-top:8px;min-height:44px}.rlnone{justify-content:space-between;gap:10px;margin-top:8px}.rlnone .pill{min-height:44px}.rrl{margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* v17: классы катушки (одноручные / двуручные) */
+.rct{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.rctg{display:inline-flex;align-items:center;gap:4px;min-height:28px;padding:0 12px;border-radius:14px;font-size:12px;font-weight:400;border:1px solid var(--ac);font-variant-numeric:tabular-nums}.rctg b{font-weight:600;font-size:13px}.rctg.f{background:var(--ac);color:#13232B}.rctg.o{color:var(--ac);background:transparent}
+.rce{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px}.rcc{flex:1 1 150px;min-width:0}.rcpp{display:flex;gap:6px;margin-top:6px}.rcpp .rcp{flex:1;min-width:0}.rcp span{white-space:nowrap;overflow:hidden;text-overflow:clip}
+/* v17: свайп-удаление в «Шнуры» */
+.swr{position:relative;overflow:hidden;border-radius:20px;margin-bottom:12px;overscroll-behavior-x:none}.swr .swi{margin-bottom:0;position:relative;z-index:1;transition:transform .22s ease;touch-action:pan-y;will-change:transform}
+.swd{position:absolute;top:0;right:0;bottom:0;width:80px;background:#E5484D;color:#fff;border:0;font:inherit;font-size:15px;font-weight:600;visibility:hidden;border-radius:0 20px 20px 0}.swr.swo .swd{visibility:visible}.swr.swo .swi{background:var(--g-fb,#1d2c34)}
+.dlg .btn.r{background:#E5484D;color:#fff;border-color:#E5484D}.dlg .btn.l{color:var(--tx,#fff)}
+.nohd{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:10px;background:rgba(255,255,255,.12);color:var(--mut);font-size:12px;font-weight:500;vertical-align:middle}
+.rmode{margin-top:4px}
+/* v17: форма шнура */
+#lfm [hidden]{display:none!important}.ltint{display:flex;flex-direction:column;gap:10px}.seg.full.ltseg{grid-template-columns:repeat(3,minmax(0,1fr))}.ltseg button{min-height:30px}.ltseg button span{overflow:hidden;text-overflow:ellipsis;font-size:13px}.lthint{font-size:13px;color:#F5A524;margin-top:-2px}
+.alsv:disabled{opacity:.4;pointer-events:none}.btn.alsv:disabled{filter:grayscale(1)}.f.dis{opacity:.5}
+.rcln{display:block;margin-top:2px;font-size:13px;font-weight:400;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.rcln b{font-weight:600}.gdot{display:inline-block;width:6px;height:6px;border-radius:3px;background:#D4AF5A;margin-right:6px;vertical-align:middle}
+.rbl .chev{flex:none;font-size:22px;color:var(--mut);margin-left:4px}
+/* v17: аудит 360 — мелкий текст ≥12px, зоны нажатия ≥44px (визуально без изменений), поля дат */
+.tl,.ibr,.lcls,.lhf,.lml,.rnc,.un,.cv,.eyb,.trv span{font-size:12px!important}
+.av,.fc,.cch,.pill.plus,.rplus,.seg.full button,.fo,.lnk,.rlact{position:relative}
+.av::after,.pill.plus::after,.rplus::after{content:'';position:absolute;inset:-4px}
+.fc::after{content:'';position:absolute;inset:-6px 0}.cch::after{content:'';position:absolute;inset:-5px 0}.seg.full button::after{content:'';position:absolute;inset:-7px 0}.fo::after{content:'';position:absolute;inset:-4px 0}.lnk::after{content:'';position:absolute;inset:0 -12px}
+.g2>*{min-width:0}input[type=date]{min-width:0;max-width:100%;width:100%;box-sizing:border-box}
+.ltseg button{padding:0 4px!important}.ltseg button span{font-size:12.5px!important;letter-spacing:-.1px}
+.seg.full.ltseg{grid-template-columns:auto auto auto!important}.ltseg button{min-width:0}
+.ttb .tgr{display:block;font-size:12px;color:var(--mu,#8FA3AD);margin-top:2px}.tstrip.tsel i{opacity:.22}.tstrip.tsel i.on{opacity:1;box-shadow:0 0 0 1.5px rgba(255,255,255,.85) inset}
+</style></head><body><div id="app"></div><script src="app.js?v=7099412f1a"></script></body></html>
