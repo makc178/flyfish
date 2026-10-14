@@ -303,4 +303,9 @@ body{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 .ltop:has(.rplus) .rplus{top:calc(env(safe-area-inset-top) + 8px + 9px);right:18px}
 body.scd .ltop:has(.rplus) .rplus{top:calc(env(safe-area-inset-top) + 6px + 4px)}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.ltop .segp .rplus{background:var(--g-fb)}}
-</style></head><body><div id="app"></div><script src="app.js?v=6484944079"></script></body></html>
+/* «+» единый во всех разделах (14.10): стекло 36px, белый плюс 18px, штрих 2 */
+button.plus,.ltop .segp .rplus{width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;padding:0;border-radius:50%!important;display:flex;align-items:center;justify-content:center;background:var(--g-card)!important;-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur);border:var(--g-border)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22)!important;color:#fff!important}
+button.plus svg,.ltop .segp .rplus svg{width:18px!important;height:18px!important;stroke:#fff;stroke-width:2!important}
+button.plus svg *,.ltop .segp .rplus svg *{stroke:#fff;stroke-width:2}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){button.plus,.ltop .segp .rplus{background:var(--g-fb)!important}}
+</style></head><body><div id="app"></div><script src="app.js?v=d8b3029ade"></script></body></html>
