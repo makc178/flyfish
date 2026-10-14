@@ -10,7 +10,7 @@ const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 
 const r1 = x => Math.round(x * 10) / 10, GR = 15.4324;
 const fg = x => x == null ? '—' : String(Math.round(+x));
 /* единицы и группы шнуров — настройка, не жёсткий код: Scandi/интегрированные в граммах, Skagit в грейнах; тип берётся из таблицы (колонка «Тип») */
-const CFG = {unit: {scandi: 'g', integrated: 'g', skagit: 'gr'}, group: {scandi: 'scandi', integrated: 'scandi', skagit: 'skagit', tip: 'tips'}, groups: ['scandi', 'skagit'], nested: {tips: 'skagit'}, needTip: 'нужен конец', srcLbl: {by_model: 'по близкой модели', approx: '≈'},
+const CFG = {unit: {scandi: 'g', integrated: 'g', skagit: 'gr'}, group: {scandi: 'scandi', integrated: 'scandi', skagit: 'skagit', tip: 'tips'}, groups: ['scandi', 'skagit'], nested: {tips: 'skagit'}, needTip: 'нужен конец', bodyTol: 1 /* г: допуск тела без концов сверх верхней границы окна Scandi */, srcLbl: {by_model: 'по близкой модели', approx: '≈'},
   /* шкала плавучести концов: от светлого (F) к тёмному (S5+) — [шаблон, фон, текст] */
   sink: [[/^\s*(f|float|плав)/i, '#EEF8FC', '#13232B'], [/^\s*(i|int|h|hover|промеж|интерм)/i, '#C3E2EE', '#13232B'], [/s\s*[1-3]\b|^\s*s[1-3]/i, '#86B8CC', '#0C1A20'], [/s\s*[4-5]\b|^\s*s[4-5]/i, '#4F849B', '#FFFFFF'], [/s\s*([6-9]|\d\d)|^\s*s|тон|sink|^t\d/i, '#2D5B70', '#FFFFFF']]};
 const UT = Object.assign({gram: 'г', grain: 'gr'}, T.units || {}), isGr = t => CFG.unit[t] === 'gr', uTxt = t => isGr(t) ? UT.grain : UT.gram;
@@ -141,9 +141,9 @@ function clsOf(s) { const n = (String(s || '').match(/\d+/g) || []).map(Number);
 /* тело головы (versitip/belly, флаг body из таблицы): каждая связка «тело + конец» — отдельная строка; без концов — «нужен конец», вес не сверяется */
 const isBody = l => !!l.body && !isGr(l.type);
 function lineMatches(r, l) { if (!isBody(l)) { const m = matchLine(r, l); return m ? [{l, m}] : []; }
-  if (l.hand && l.hand !== 'both' && l.hand !== hand(r)) return []; if (!rodRange(r, l.type)) return [];
+  if (l.hand && l.hand !== 'both' && l.hand !== hand(r)) return []; const rg = rodRange(r, l.type); if (!rg) return [];
   const ts = (l.tips || []).filter(t => num(t.w_g) != null);
-  if (!ts.length) return [{l, m: {lvl: 'fb', kind: 'need', need: true, w: null, v: null, u: uTxt(l.type), rg: null, why: CFG.needTip}}];
+  if (!ts.length) return lineG(l) != null && lineG(l) > rg.hi + CFG.bodyTol ? [] : [{l, m: {lvl: 'fb', kind: 'need', need: true, w: null, v: null, u: uTxt(l.type), rg: null, why: CFG.needTip}}];
   return ts.map(t => { const m = matchLine(r, {...l, has_tips: true, tips: [t]}); return m ? {l, m: {...m, combo: true, base: lineG(l)}} : null; }).filter(Boolean); }
 const comboTxt = (l, m) => { if (!(m.combo && m.tip)) return sname(l); const t = m.tip, tip = `${t.name || 'конец'}${t.len_ft != null ? ' ' + String(t.len_ft).replace('.', ',') + ' фт' : ''}${t.sink ? ' ' + t.sink : ''}`;
   return (T.rod_card.combo || '{body} + {tip} = {total} г').replace('{body}', sname(l)).replace('{tip}', tip).replace('{total}', fg(m.base + num(t.w_g))); };
