@@ -37,7 +37,7 @@ async function save(local) { S.updated = Date.now(); await idb.set('state', {sal
 /* ---------- PIN ---------- */
 let pinBuf = '', pinMode = 'unlock', pinFirst = '', pinBusy = false, RESTORE = null;
 /* автообновление: сверяем сборку с version.json (без кэша); новая версия — перезагрузка, кроме открытой формы */
-const BUILD = '0412be2499', BUILT = '2026-10-14T13:14Z';
+const BUILD = '421619047f', BUILT = '2026-10-14T13:16Z';
 async function checkUpdate() { try { const j = await (await fetch('version.json?t=' + Date.now(), {cache: 'no-store'})).json();
   if (j.v && j.v !== BUILD && String(j.built || '') > BUILT && VIEW.t !== 'form' && sessionStorage.getItem('ff-upd') !== j.v) { sessionStorage.setItem('ff-upd', j.v); const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); location.replace(location.pathname + '?v=' + j.v); } } catch (e) {} }
 async function boot() {
@@ -750,7 +750,7 @@ function bind() {
     if (d.tsnew != null) { DRAFT = {ltype: 'tip', hand: 'double', bn: '1', bz: [], tsys: 'scandi'}; return go({t: 'lform', root: 'lines'}); }
     if (d.tssys) { tsRead(); TSF.system = d.tssys; return render(); }
     if (d.tscancel != null) { TSF = null; return render(); }
-    if (d.tssave) { tsRead(); tsSave(d.tssave, TSF); TSF = null; await save(); toast(T.forms.saved); render(); flushLineq(); return; }
+    if (d.tssave) { tsRead(); if (!String(TSF.brand || '').trim()) return toast(T.forms.required); tsSave(d.tssave, TSF); TSF = null; await save(); toast(T.forms.saved); render(); flushLineq(); return; }
     if (d.cls) { if (d.cls === 'all') VIEW.cls = []; else { const n = +d.cls, c = VIEW.cls || []; VIEW.cls = c.includes(n) ? c.filter(z => z !== n) : [...c, n]; } OPEN = null; return render(); }
     if (d.tog) { OPEN = OPEN === d.tog ? null : d.tog; return render(); }
     if (d.open) { REF = null; const [k, ...id] = d.open.split(':'); if (k === 'trip') { KP = null; return go({t: 'trip', id: id.join(':'), root: 'trips'}); } return go({t: k, id: id.join(':'), root: VIEW.root || VIEW.t}); }
