@@ -295,4 +295,12 @@ body:after{content:'';position:fixed;inset:-10%;pointer-events:none;z-index:-2;o
 .tb .on{color:#fff;background:rgba(255,255,255,.16)!important;border-color:rgba(255,255,255,.24);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}.tb .on .tl{font-weight:600}
 body{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.tb{background:var(--g-fb)}}
-</style></head><body><div id="app"></div><script src="app.js?v=efa9b0cfff"></script></body></html>
+
+/* фикс 14.10 (Дизайнер): «+» в шапке справа, круглая стеклянная 36px; переключатель на всю ширину ниже */
+.segp .seg.full button:first-child{padding-right:16px}.segp .seg.full button:last-child{padding-left:16px}
+.ltop .segp .rplus{position:absolute;left:auto;right:0;top:calc(-1 * var(--hrow-off,0px));margin:0;width:36px;height:36px;border-radius:50%;background:var(--g-card);-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur);border:var(--g-border);box-shadow:inset 0 1px 0 rgba(255,255,255,.22);color:#fff}
+.ltop:has(.rplus){position:sticky}.ltop:has(.rplus) .segp{position:static}
+.ltop:has(.rplus) .rplus{top:calc(env(safe-area-inset-top) + 8px + 9px);right:18px}
+body.scd .ltop:has(.rplus) .rplus{top:calc(env(safe-area-inset-top) + 6px + 4px)}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.ltop .segp .rplus{background:var(--g-fb)}}
+</style></head><body><div id="app"></div><script src="app.js?v=6484944079"></script></body></html>
