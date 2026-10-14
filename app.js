@@ -37,7 +37,7 @@ async function save(local) { S.updated = Date.now(); await idb.set('state', {sal
 /* ---------- PIN ---------- */
 let pinBuf = '', pinMode = 'unlock', pinFirst = '', pinBusy = false, RESTORE = null;
 /* автообновление: сверяем сборку с version.json (без кэша); новая версия — перезагрузка, кроме открытой формы */
-const BUILD = '9eb72f62c6', BUILT = '2026-10-14T19:59Z';
+const BUILD = 'a8f3ca79ff', BUILT = '2026-10-14T20:06Z';
 async function checkUpdate() { try { const j = await (await fetch('version.json?t=' + Date.now(), {cache: 'no-store'})).json();
   if (j.v && j.v !== BUILD && String(j.built || '') > BUILT && VIEW.t !== 'form' && sessionStorage.getItem('ff-upd') !== j.v) { sessionStorage.setItem('ff-upd', j.v); const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); location.replace(location.pathname + '?v=' + j.v); } } catch (e) {} }
 async function boot() {
@@ -188,7 +188,7 @@ const GL = {rods: '<path d="M4 20 19.5 4.5"/><path d="M6.5 17.5l-1.6-1.6M17 7l1.
   trips: '<rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M7.5 14h4"/>',
   reels: '<circle cx="11" cy="12" r="8"/><circle cx="11" cy="12" r="2.6"/><path d="M11 4v2.4M11 17.6V20M3 12h2.4M16.6 12H19"/><path d="M19 12h2.5v3"/>'};
 /* иконки интерфейса: файлы Дизайнера (/workspace/flyfish_icons) встраивает build.py; для остальных — временные по его спецификации */
-const ICN = {single: '<path d="M6 19 18 5"/><circle cx="7.5" cy="17.2" r="1.6"/>',
+const ICN = {trips: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 9.5h17"/><path d="M6 17c1.5-1 3-1 4.5 0s3 1 4.5 0 2.5-.8 3 0"/><path d="M9.5 13.5c1-.9 2-1.3 3-1.3s2 .5 2.6 1.3c-.6.8-1.6 1.3-2.6 1.3s-2-.4-3-1.3z"/><path d="M9.5 13.5 8 12.6v1.8z"/>', single: '<path d="M6 19 18 5"/><circle cx="7.5" cy="17.2" r="1.6"/>',
   double: '<path d="M5 19 19 5"/><circle cx="7" cy="17" r="1.6"/><circle cx="10.5" cy="13.5" r="1.6"/>',
   class: '<path d="M9 4 7 20M17 4l-2 16M4.5 9h15M4 15h15"/>', length: '<path d="M3 12h18M3 9v6M21 9v6M7 12v-2M11 12v-3M15 12v-2"/>',
   maker: '<path d="M4 20V9l8-5 8 5v11"/><path d="M9 20v-6h6v6"/>', weight: '<path d="M6 9h12l2 11H4L6 9Z"/><circle cx="12" cy="6" r="2"/>',
@@ -677,7 +677,7 @@ function tripsView() { const now = new Date(), m = VIEW.m || ymd(now).slice(0, 7
   const ms = ymd(first), me = ymd(last), inM = ts.filter(t => t.from && t.to ? t.from <= me && t.to >= ms : false);
   const card = t => `<button class="card row tcard" data-open="trip:${t.id}"><span class="rbdg">${esc(rAbbr(t.region))}</span><div style="flex:1;min-width:0;text-align:left"><div class="t">${esc(t.river || '—')}</div><div class="mut sm">${esc(tDates(t))}${t.camp ? ' · ' + esc(t.camp) : ''}</div><div style="margin-top:6px"><span class="tst s-${t.status || 'plan'}">${esc(TR.status_values[t.status || 'plan'])}</span>${(t.kits || []).some(k => kitMiss(k).length) ? ' <i class="adot" aria-hidden="true"></i>' : ''}</div></div><span class="chev" aria-hidden="true">›</span></button>`;
   const mv = d => { const x = new Date(Y, M - 1 + d, 1); return ymd(x).slice(0, 7); };
-  return `<div class="w lw"><div class="ltop"><div class="lhd"><div class="ltb"><h1 class="lt">${esc(TR.title)}</h1><div class="cnt">${esc(T.list.count.replace('{n}', S.trips.length))}</div></div><div class="rt"><button class="av" data-tab="profile" aria-label="Профиль">${ICO.user}</button><button class="pill ac plus" data-tnew aria-label="${esc((T.plus_aria || {}).trips || TR.add)}" title="${esc((T.plus_aria || {}).trips || TR.add)}">${ICO.plus}</button></div></div></div></div>
+  return `<div class="w lw"><div class="ltop"><div class="lhd hdr2"><div class="hrow"><span class="hgs"><button class="av" data-ref aria-label="${esc(RF.aria || RF.title)}" title="${esc(RF.title)}">${ICO.book}</button><button class="av" data-tab="profile" aria-label="Профиль" title="${esc(syncTxt())}">${ICO.user}</button></span><span class="hcw" aria-hidden="true" style="--cw:${(T.list.crest || {}).w || 64}px;--ch:${(T.list.crest || {}).h || 54}px;--br:${(T.list.crest || {}).breath_s || 4}s;--gl:${(T.list.crest || {}).glint_s || 6}s"><span class="hcr"><img src="art/crest.svg" alt=""></span></span><span class="hgs r"><button class="pill ac plus" data-tnew aria-label="${esc((T.plus_aria || {}).trips || TR.add)}" title="${esc((T.plus_aria || {}).trips || TR.add)}">${ICO.plus}</button></span></div><h1 class="lt">${esc(TR.title)}</h1></div></div></div>
   <div class="w"><div class="card cal"><div class="row cmh"><button class="cb" data-tm="${mv(-1)}" aria-label="Предыдущий месяц">‹</button><b>${esc(TR.months[M - 1])} ${Y}</b><button class="cb" data-tm="${mv(1)}" aria-label="Следующий месяц">›</button></div><div class="cdays cwd">${TR.wd.map(d => `<span>${d}</span>`).join('')}</div>${cal}</div>
   <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">${inM.length ? inM.map(card).join('') : `<div class="mut" style="padding:20px 4px;text-align:center">${esc(TR.empty)}</div>`}</div></div>`; }
 /* слот комплекта: картинка снасти, пустой — пунктир с «+», янтарная точка если комплект неполный */
