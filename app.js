@@ -46,7 +46,7 @@ async function save(local) { S.updated = Date.now(); await idb.set('state', {sal
 /* ---------- PIN ---------- */
 let pinBuf = '', pinMode = 'unlock', pinFirst = '', pinBusy = false, RESTORE = null;
 /* автообновление: сверяем сборку с version.json (без кэша); новая версия — перезагрузка, кроме открытой формы */
-const BUILD = 'ec66688f12', BUILT = '2026-10-15T10:27Z';
+const BUILD = '145819e487', BUILT = '2026-10-15T11:40Z';
 async function checkUpdate() { try { const j = await (await fetch('version.json?t=' + Date.now(), {cache: 'no-store'})).json();
   if (j.v && j.v !== BUILD && String(j.built || '') > BUILT && VIEW.t !== 'form' && sessionStorage.getItem('ff-upd') !== j.v) { sessionStorage.setItem('ff-upd', j.v); const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); location.replace(location.pathname + '?v=' + j.v); } } catch (e) {} }
 async function boot() {
@@ -846,6 +846,7 @@ function alAuto(d) { const w = num(d.w); if (w == null || d.ltype === 'running')
 function bForm(d, chips) { const n = +d.bn || 1, z = (d.bz || []).slice(0, n), L = [BT.rear, BT.middle, BT.front], pos = n === 1 ? [L[0]] : n === 2 ? [L[0], L[2]] : L;
   const sel = i => { const prev = i ? z[i - 1] : null, opts = BD.scale.filter(c => !prev || bIdx(c) > bIdx(prev)); return `<label class="f"><small>${esc(pos[i])}</small><select data-bz="${i}"><option value="">—</option>${opts.map(c => `<option value="${c}"${z[i] === c ? ' selected' : ''}>${esc(bLbl(c))}</option>`).join('')}</select></label>`; };
   return `<div class="cap">${esc(BT.title)}</div>${chips('bn', [['1', BT.single], ['2', BT.dual], ['3', BT.triple]].slice(0, BD.max_parts))}<div class="bprev">${bStrip(z.filter(Boolean)) || '<span class="mut sm2">—</span>'}<span class="mono">${esc(z.filter(Boolean).join('/'))}</span></div>${[...Array(n)].map((_, i) => sel(i)).join('')}`; }
+const ftIn = v => { const f = num(v); if (f == null || !(f > 0)) return ''; let ft = Math.floor(f), inch = Math.round((f - ft) * 12); if (inch === 12) { ft++; inch = 0; } return `${ft}'${inch ? inch + '"' : ''} · ${(f * 0.3048).toFixed(1).replace('.', ',')} м`; };
 function lform() { const d = DRAFT, t = d.ltype, chips = (n, opts, multi) => `<div class="seg wrap" data-alseg="${n}"${multi ? ' data-multi="1"' : ''}>${opts.map(([k, l]) => `<button type="button" data-v="${esc(k)}" class="${(multi ? (d[n] || []).includes(k) : d[n] === k) ? 'on' : ''}">${esc(l)}</button>`).join('')}</div>`;
   const tips = S.lines.filter(l => l.type === 'tip'), wl = t === 'skagit' ? AL.weight_gr : AL.weight_g;
   const LK = AL.kinds || {}, kind = t === 'integrated' ? 'integrated' : t === 'tipset' ? 'tipset' : 'head';
@@ -854,9 +855,9 @@ function lform() { const d = DRAFT, t = d.ltype, chips = (n, opts, multi) => `<d
   if (sgl) d.ltype = 'full'; else if (d.ltype === 'full') d.ltype = null;
   const b = `<div class="cap">${esc(AL.hand)}</div>${chips('hand', [['single', T.tabs.single], ['double', T.tabs.double]])}
   ${pickF(AL.brand, 'lbrand', d._brandOther ? AL.brand_other : d.brand)}${d._brandOther ? FL(AL.brand_custom || 'Свой производитель', 'brand', d.brand) : ''}${FL(AL.model, 'model', d.model)}
-  ${sgl ? FL(AL.single_class || 'Класс AFTMA', 'aftma', d.aftma, 'number') : `<div class="cap">${esc(AL.type)}</div><div class="seg full tkind ltseg" role="radiogroup">${DT_.map(([k, l]) => `<button type="button" data-ltp="${k}" role="radio" aria-checked="${t === k}" class="${t === k ? 'on' : ''}"><span>${esc(l)}</span></button>`).join('')}</div><div class="lthint" id="lthint"${hid(off)}>${esc(AL.type_hint || '')}</div>`}
+  ${sgl ? FL(AL.single_class || 'Класс AFTMA', 'aftma', d.aftma, 'number') : `<div class="cap">${esc(AL.type)}</div><div class="seg full tkind ltseg" role="radiogroup">${DT_.map(([k, l]) => `<button type="button" data-ltp="${k}" role="radio" aria-checked="${t === k}" class="${t === k ? 'on' : ''}"><span>${esc(l)}</span></button>`).join('')}</div><div class="lthint" id="lthint"${hid(off)}>${esc(AL.type_hint || '')}</div>`}${sgl ? '' : (() => { const C = TMC(), tv = d.tm || (C.default || {})[t] || null; return `<div id="lt-tm"${hid(tmOn({type: t}))}><div class="cap">${esc(C.form_title || 'Концы')}</div><div class="tmseg" role="radiogroup" style="--tmon:${esc(C.color_on || '#C9A45C')}">${[['versi', C.seg_versi || 'Под верситип'], ['solid', C.seg_solid || 'Цельный']].map(([k, x]) => `<button type="button" role="radio" aria-checked="${tv === k}" class="${tv === k ? 'on' : ''}" data-tmf="${k}">${esc(x)}</button>`).join('')}</div></div>`; })()}
   <label class="f${off ? ' dis' : ''}" id="lwf"><small id="lwl">${esc(sgl || u !== 'gr' ? AL.weight_g : AL.weight_gr)}</small><input name="w" value="${esc(d.w ?? '')}" inputmode="numeric" class="mono" autocomplete="off"${off ? ' disabled' : ''}></label><div class="mut sm2" id="alauto">${esc(alAuto(d))}</div>${d.edit ? lcRow(d) : ''}
-  <div id="lt-head"${hid(!sgl && (t === 'scandi' || t === 'skagit'))}>${FL(AL.head_ft, 'head_ft', d.head_ft, 'number')}</div>
+  <div id="lt-head"${hid(!sgl && (t === 'scandi' || t === 'skagit'))}>${FL(AL.head_ft, 'head_ft', d.head_ft, 'number')}<div class="mut sm2" id="lhfi">${esc(ftIn(d.head_ft))}</div></div>
   <div id="lt-int" class="ltint"${hid(t === 'integrated')}>${pickF(AL.reel || 'Катушка', 'lreel', d.reel_id ? sname(byId('reels', d.reel_id)) : '')}<div class="mut sm2">${esc(AL.reel_hint || '')}</div>${FL(AL.head_m || 'Длина головы, м', 'head_m', d.head_m, 'number')}</div>
   ${bForm(d, chips)}
   ${FL(AL.note, 'note', d.note)}`;
@@ -892,6 +893,7 @@ async function alSave() { alRead(); const d = DRAFT, t = d.ltype;
   S.lines.push(l);
   const SC_ = AL.sheet_cols || {}, row = {'Производитель': l.brand, 'Модель': l.model, ...((TMC().default || {})[t] ? {[TMC().col_write || 'Концы (верситип/цельный)']: (TMC().default[t] === 'versi' ? TMC().write_versi : TMC().write_solid) || ''} : {}), [SC_.type_d || 'Тип (скандинавская голова/Skagit/полный шнур/раннинг)']: AL.sheet_types[t] || t, [SC_.type_o || 'Тип']: (AL.sheet_type_o || {})[t] || AL.sheet_types[t] || t, ...(ac != null ? {[SC_.cls || 'Класс']: '#' + ac} : {}), 'Класс/вес (грейн)': l.w_gr != null ? `${l.w_gr} (${String(l.w_g).replace('.', ',')} г)` : '',
     [BD.sheet_column || 'Степень плавучести']: fl, 'Длина': l.length || '', 'Примечание': [d.note, tip ? 'Конец: ' + sname(tip) : '', l.tip_len != null ? `${TT.title}: ${l.tip_brand} ${l.tip_len}'` : '', l.hand ? 'Для: ' + (T.tabs[l.hand] || l.hand).toLowerCase() : ''].filter(Boolean).join('; '), 'Дата покупки': l.buy.date || '', ...(l.reel_id ? {'Катушка': l.reel} : {})};
+  if (d.tm && tmOn(l)) { l.tipmode = d.tm; row[TMC().col_write || 'Концы (верситип/цельный)'] = d.tm === 'versi' ? TMC().write_versi || 'верситип' : TMC().write_solid || 'цельный'; }
   S.lineq = S.lineq || {}; S.lineq[l.id] = {row, at: new Date().toISOString()};
   await save(); toast(T.forms.saved); DRAFT = null; VIEW = {...tabView('lines'), tab: l.hand === 'single' ? 'single' : 'double'}; HIST.length = 0; render(); flushLineq(); }
 
@@ -923,6 +925,7 @@ async function alSaveEdit(d, t, w) { const l = byId('lines', d.edit); if (!l) re
   const ac = t === 'full' ? num(d.aftma) : null; if (t === 'full' && ac == null) return toast(T.forms.required);
   const gr = alGr(d), wg = w == null ? null : gr ? Math.round(w / GRM * 10) / 10 : Math.round(w), wgr = w == null ? null : gr ? Math.round(w) : l.w_gr != null && l.w_g != null && Math.round(l.w_g) === Math.round(w) ? l.w_gr : grR(w * GRM), fl = bMerge((d.bz || []).slice(0, +d.bn || 1).filter(Boolean)).join('/'), hf = num(d.head_ft);
   const chg = l.type !== t || l.w_g !== wg || l.w_gr !== wgr; Object.assign(l, {brand: d.brand || '', model: d.model, type: t, hand: d.hand || l.hand, w_g: wg, w_gr: wgr, float: fl || null, note: d.note || null, edited: true, ...(hf != null ? {head_ft: hf, head_m: Math.round(hf * 0.3048 * 10) / 10} : {})});
+  if (d.tm && tmOn(l) && d.tm !== l.tipmode) tmSet(l, d.tm);
   const wasMan = !!l.cls_man, LE = LCE();
   if (d.cm && d.cv) { const plus = d.cv[1] == null; Object.assign(l, {cls_man: true, cls_plus: plus, reg_cls: [d.cv[0], plus ? (+LE.plus_max || 11) : d.cv[1]], cls_edit_at: Date.now()}); l.class = lcTxt(d.cv); }
   else if (d.cauto) { l.cls_man = false; l.cls_plus = false; delete l.reg_cls; l.cls = null; l.class = ''; l.cls_edit_at = Date.now(); if (ac != null && t === 'full') Object.assign(l, {cls: [ac, ac], class: '#' + ac, reg_cls: [ac, ac]}); }
@@ -1296,13 +1299,14 @@ function bind() {
     if (d.addline != null) { ALH = {}; return render(); }
     if (d.alclose != null) { ALH = null; return render(); }
     if (d.ledit) { const l = byId('lines', d.ledit); if (!l) return; const t = l.type === 'scandi' && l.body ? 'scandi' : l.type, gr = LTU(t) === 'gr', bz = String(l.float || '').split('/').filter(Boolean);
-      DRAFT = {edit: l.id, ltype: t, hand: l.hand || 'double', brand: l.brand || '', model: l.model || '', w: gr ? (l.w_gr ?? '') : (l.w_g ?? ''), aftma: t === 'full' && l.cls ? l.cls[0] : '', bn: String(bz.length || 1), bz, head_ft: l.head_ft ?? '', head_m: l.head_m ?? '', reel_id: l.reel_id || '', note: l.note || '', bought: '', cm: !!l.cls_man, cv: lineCls(l) ? [lineCls(l)[0], l.cls_plus ? null : lineCls(l)[1]] : null};
+      DRAFT = {edit: l.id, ltype: t, hand: l.hand || 'double', brand: l.brand || '', model: l.model || '', w: gr ? (l.w_gr ?? '') : (l.w_g ?? ''), aftma: t === 'full' && l.cls ? l.cls[0] : '', bn: String(bz.length || 1), bz, head_ft: l.head_ft ?? '', head_m: l.head_m ?? '', reel_id: l.reel_id || '', note: l.note || '', bought: '', tm: tmOn({type: t}) ? tmOf(l) : null, cm: !!l.cls_man, cv: lineCls(l) ? [lineCls(l)[0], l.cls_plus ? null : lineCls(l)[1]] : null};
       document.querySelectorAll('.swr.swo').forEach(r => { r.classList.remove('swo'); const e = r.querySelector('.swi'); if (e) e.style.transform = ''; }); return go({t: 'lform', root: 'lines'}); }
     if (d.alo) { ALH = null; if (d.alo === 'photo') { LPH = {}; return render(); } DRAFT = {ltype: (VIEW.tab || 'double') === 'single' ? 'full' : null, hand: VIEW.tab || 'double', bn: '1', bz: []}; return go({t: 'lform', root: 'lines'}); }
+    if (d.tmf) { DRAFT.tm = d.tmf; document.querySelectorAll('[data-tmf]').forEach(x => { const on = x.dataset.tmf === d.tmf; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); return; }
     if (d.ltp) { alRead(); const u0 = LTU(DRAFT.ltype), u1 = LTU(d.ltp); DRAFT.ltype = d.ltp; const f = document.getElementById('lfm'); if (!f) return render();
       f.querySelectorAll('[data-ltp]').forEach(x => { const on = x.dataset.ltp === d.ltp; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); });
       const inp = f.querySelector('input[name=w]'); if (u0 && u0 !== u1) { inp.value = ''; DRAFT.w = ''; } inp.disabled = false; document.getElementById('lwf').classList.remove('dis'); document.getElementById('lwl').textContent = u1 === 'gr' ? AL.weight_gr : AL.weight_g;
-      const h = document.getElementById('lthint'); if (h) h.hidden = true; document.getElementById('lt-head').hidden = !['scandi', 'skagit'].includes(d.ltp); document.getElementById('lt-int').hidden = d.ltp !== 'integrated'; if (d.ltp !== 'integrated') DRAFT.reel_id = null;
+      const h = document.getElementById('lthint'); if (h) h.hidden = true; document.getElementById('lt-head').hidden = !['scandi', 'skagit'].includes(d.ltp); document.getElementById('lt-int').hidden = d.ltp !== 'integrated'; const tmb = document.getElementById('lt-tm'); if (tmb) { tmb.hidden = !tmOn({type: d.ltp}); const tv = DRAFT.tm || (TMC().default || {})[d.ltp] || null; tmb.querySelectorAll('[data-tmf]').forEach(x => { const on = x.dataset.tmf === tv; x.classList.toggle('on', on); x.setAttribute('aria-checked', on); }); } if (d.ltp !== 'integrated') DRAFT.reel_id = null;
       document.querySelectorAll('.alsv').forEach(x => x.disabled = false); const a = document.getElementById('alauto'); if (a) a.textContent = alAuto(DRAFT); return; }
     if (d.lcls != null) return lcOpen();
     if (d.alsave != null) { if (t.disabled) return; return alSave(); }
@@ -1402,3 +1406,4 @@ boot();
   addEventListener('touchend', end); addEventListener('touchcancel', end); })();
 
 ;(()=>{let on=false;const u=()=>{const v=scrollY>24;if(v!==on){on=v;document.body.classList.toggle('scd',v)}};addEventListener('scroll',u,{passive:true});u()})();
+document.addEventListener('input', e => { const i = e.target; if (i && i.name === 'head_ft') { const h = document.getElementById('lhfi'); if (h) h.textContent = ftIn(i.value.replace(',', '.')); } });
