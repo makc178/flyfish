@@ -46,7 +46,7 @@ async function save(local) { S.updated = Date.now(); await idb.set('state', {sal
 /* ---------- PIN ---------- */
 let pinBuf = '', pinMode = 'unlock', pinFirst = '', pinBusy = false, RESTORE = null;
 /* автообновление: сверяем сборку с version.json (без кэша); новая версия — перезагрузка, кроме открытой формы */
-const BUILD = '7e1becbc0d', BUILT = '2026-10-15T13:52Z';
+const BUILD = 'e597d06888', BUILT = '2026-10-15T14:00Z';
 async function checkUpdate() { try { const j = await (await fetch('version.json?t=' + Date.now(), {cache: 'no-store'})).json();
   if (j.v && j.v !== BUILD && String(j.built || '') > BUILT && VIEW.t !== 'form' && sessionStorage.getItem('ff-upd') !== j.v) { sessionStorage.setItem('ff-upd', j.v); const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); location.replace(location.pathname + '?v=' + j.v); } } catch (e) {} }
 async function boot() {
@@ -207,7 +207,7 @@ const rodLines = r => S.lines.flatMap(l => lineMatches(r, l)).sort((a, b) => RAN
 const clsU = (a, b) => !a ? (b || null) : !b ? a : [Math.min(a[0], b[0]), a[1] == null || b[1] == null ? null : Math.max(a[1], b[1])];
 const rcOf = (x, h) => h === 'single' ? x.cls_s : x.cls_d;
 /* миграция старого состояния: один класс + назначение → две колонки; cls = объединение (для фильтра и сортировки) */
-function normReels() { for (const x of S.reels) { if (x.cls_s === undefined && x.cls_d === undefined) { const c = x.cls || null; x.cls_s = c && x.hand !== 'double' ? c : null; x.cls_d = c && x.hand !== 'single' ? c : null; } x.cls = clsU(x.cls_s, x.cls_d); } }
+function normReels() { for (const x of S.reels) { if (x.cls_s === undefined && x.cls_d === undefined) { const c = x.cls || null; x.cls_s = c && x.hand !== 'double' ? c : null; x.cls_d = c && x.hand !== 'single' ? c : null; } if (x.hand === 'double') x.cls_s = null; x.cls = clsU(x.cls_s, x.cls_d); } }
 /* подбор катушки к удилищу: по колонке класса для типа удилища; пустая колонка — к этому типу не подходит */
 function rodReels(r) { return S.reels.map(x => { if (x.rods) return x.rods.includes(r.id) ? {x, r, lvl: 'ok'} : null; const c = rcOf(x, hand(r)); if (!c) return null; if (!r.cls) return {x, r, lvl: 'fb', why: 'класс удилища не указан'};
   return c[0] <= (r.cls[1] ?? r.cls[0]) && (c[1] == null || c[1] >= r.cls[0]) ? {x, r, lvl: 'ok'} : null; }).filter(Boolean); }
@@ -615,7 +615,7 @@ const RC = T.reel_card || {};
 function reelSegs(x) { const row = (lbl, key, vals, v) => `<div class="rseg" style="margin-top:12px"><div class="row" style="justify-content:space-between"><small class="mut">${esc(lbl)}</small><small class="mut sm">${v ? '' : esc(RC.not_set || 'Не указан')}</small></div><div class="seg full" style="margin-top:6px;grid-template-columns:repeat(${Object.keys(vals).length},1fr)">${Object.entries(vals).map(([k, t]) => `<button type="button" data-rset="${key}:${k}" class="${v === k ? 'on' : ''}" aria-pressed="${v === k}"><span>${esc(t)}</span></button>`).join('')}</div></div>`;
   const sg = RC.segs || ['hand', 'line_kind']; return (sg.includes('hand') ? row(RC.rod_type || 'Для удилищ', 'hand', RC.rod_type_values || {single: 'Одноручные', double: 'Двуручные', both: 'Оба'}, x.hand) : '') + (sg.includes('line_kind') ? row(RC.line_kind || 'Тип шнура', 'line_kind', RC.line_kind_values || {running: 'Раннинг', line: 'Шнур'}, x.line_kind) : ''); }
 /* ручная правка катушки: в зашифрованное состояние + открытая заявка requests/reel_edits/<id>.json в закрытом репозитории → reel_edits.py → таблица (колонки M/O) */
-async function reelSet(id, key, v) { const x = byId('reels', id); if (!x) return; x[key] = x[key] === v ? null : v; if (key === 'hand') x.rods = null; x.edited = true;
+async function reelSet(id, key, v) { const x = byId('reels', id); if (!x) return; x[key] = x[key] === v ? null : v; if (key === 'hand') { x.rods = null; if (x.hand === 'double') { x.cls_s = null; x.cls = clsU(null, x.cls_d); } } x.edited = true;
   S.reelq = S.reelq || {}; S.reelq[id] = {hand: x.hand || null, line_kind: x.line_kind || null, at: new Date().toISOString()}; await save(); toast(RC.saved || 'Сохранено'); render(); flushReelq(); }
 async function flushReelq() { const tok = S?.sync?.token, q = S?.reelq; if (!tok || !q) return;
   for (const [id, e] of Object.entries(q)) { if (!id.startsWith('sheet:reel:')) { delete q[id]; continue; } const x = byId('reels', id) || {}, f = 'requests/reel_edits/' + id.replace(/[^a-z0-9]+/gi, '_') + '.json';
@@ -1167,7 +1167,7 @@ function rcEdit(x) { const FR = T.forms.reel, C = FR.cls2 || {}, ini = (c, a) =>
   ini(x.cls_s, '_s'); ini(x.cls_d, '_d');
   const pk = (n, lbl, v, lo) => `<button type="button" class="f pickf rcp" onclick="wheelOpen('${n}')"><small>${esc(lbl)}</small><span class="${v ? '' : 'mut'}">${v ? (v === '+' ? '#' + (lo || '') + '+' : '#' + esc(v)) : esc(C.empty || 'не подходит')}</span></button>`;
   const col = (a, lbl) => `<div class="rcc"><div class="cap">${esc(lbl)}</div><div class="rcpp">${pk(a + '1', C.from || 'от', x[a + '1'])}${pk(a + '2', C.to || 'до', x[a + '2'], x[a + '1'])}</div></div>`;
-  return `<div class="rce">${col('_s', C.single || 'Класс для одноручных')}${col('_d', C.double || 'Класс для двуручных')}</div><div class="mut sm2">${esc(C.hint || '')}</div>`; }
+  return `<div class="rce">${x.hand === 'double' ? '' : col('_s', C.single || 'Класс для одноручных')}${col('_d', C.double || 'Класс для двуручных')}</div><div class="mut sm2">${esc(C.hint || '')}</div>`; }
 const rcRange = (a, b) => { const lo = num(a); if (lo == null) return null; if (b === '+') return [lo, null]; const hi = num(b); return [lo, hi != null && hi >= lo ? hi : lo]; };
 function form(v) { const k = v.k, x = DRAFT, F = T.forms; const ttl = v.id ? T.rod_card.edit : F[k === 'rods' ? 'rod' : k === 'reels' ? 'reel' : 'line'].title;
   let b = '';
@@ -1204,7 +1204,7 @@ function commit() { readForm(); const k = VIEW.k, d = DRAFT; if (!d.model) retur
   if (k === 'rods') { if (!d.type) return toast(T.forms.rod.no_type); const c1 = num(d.c1 ?? d.cls?.[0]), c2 = num(d.c2 ?? d.cls?.[1]) ?? c1, cl = c1 != null ? [Math.min(c1, c2), Math.max(c1, c2)] : null;
     o = {type: d.type, brand: d.brand === T.forms.rod.brand_other ? '' : d.brand, model: d.model, length: d.length, class: cl ? '#' + (cl[0] === cl[1] ? cl[0] : cl.join('/')) : '', cls: cl, note: d.note || null};
     const old = byId('rods', VIEW.id), has = old && (old.scandi_g || old.skagit_gr || old.skagit_g); if (!has) Object.assign(o, recFromRef(d.type, cl)); }
-  if (k === 'reels') { const cs = rcRange(d._s1, d._s2), cd = rcRange(d._d1, d._d2); o = {brand: d.brand === T.forms.reel.brand_other ? '' : d.brand, model: d.model === T.forms.reel.model_other ? '' : d.model, cls_s: cs, cls_d: cd, cls: clsU(cs, cd), hand: d.hand || null, note: d.note || null}; }
+  if (k === 'reels') { const cs = d.hand === 'double' ? null : rcRange(d._s1, d._s2), cd = rcRange(d._d1, d._d2); o = {brand: d.brand === T.forms.reel.brand_other ? '' : d.brand, model: d.model === T.forms.reel.model_other ? '' : d.model, cls_s: cs, cls_d: cd, cls: clsU(cs, cd), hand: d.hand || null, note: d.note || null}; }
   if (k === 'lines') { if (d.type !== 'tip' && num(d.w_g) == null && num(d.w_gr) == null) return toast(T.forms.required);
     o = {type: d.type || 'scandi', hand: d.hand || 'double', brand: d.brand, model: d.model, w_g: num(d.w_g) ?? (num(d.w_gr) != null ? r1(num(d.w_gr) / GR) : null), w_gr: num(d.w_gr) ?? (num(d.w_g) != null ? Math.round(num(d.w_g) * GR) : null), length: d.length, class: d.class, cls: clsOf(d.class), float: d.float, has_tips: !!d.has_tips, tips: d.has_tips ? d.tips.filter(t => t.name || t.w_g) : [], note: d.note || null}; }
   const arr = S[k], i = arr.findIndex(y => y.id === VIEW.id);
