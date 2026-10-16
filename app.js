@@ -46,7 +46,7 @@ async function save(local) { S.updated = Date.now(); await idb.set('state', {sal
 /* ---------- PIN ---------- */
 let pinBuf = '', pinMode = 'unlock', pinFirst = '', pinBusy = false, RESTORE = null;
 /* автообновление: сверяем сборку с version.json (без кэша); новая версия — перезагрузка, кроме открытой формы */
-const BUILD = 'ed13b63e74', BUILT = '2026-10-15T23:08Z';
+const BUILD = 'a6ba0168a3', BUILT = '2026-10-16T00:15Z';
 async function checkUpdate() { try { const j = await (await fetch('version.json?t=' + Date.now(), {cache: 'no-store'})).json();
   if (j.v && j.v !== BUILD && String(j.built || '') > BUILT && VIEW.t !== 'form' && sessionStorage.getItem('ff-upd') !== j.v) { sessionStorage.setItem('ff-upd', j.v); const r = await navigator.serviceWorker?.getRegistration(); await r?.update(); location.replace(location.pathname + '?v=' + j.v); } } catch (e) {} }
 async function boot() {
@@ -228,7 +228,7 @@ function safeZone() { const vv = window.visualViewport, vh = vv ? Math.min(inner
 /* раскрытие карточки: плавно докрутить так, чтобы её нижний край («Подробнее») встал над капсулой */
 function reveal(el, o = {}) { if (!el) return; const r = el.getBoundingClientRect(), z = safeZone(); let dy = 0; if (o.alignTop) { dy = r.top - z.top; if (Math.abs(dy) > 1) scrollBy({top: dy, behavior: 'auto'}); if (!o.again) setTimeout(() => el.isConnected && reveal(el, {...o, again: true}), 200); return; }
   if (r.bottom > z.bot) dy = r.bottom - z.bot; if (o.keepTop !== false && r.height <= z.bot - z.top && r.top - dy < z.top) dy = r.top - z.top; if (r.top < z.top && r.height <= z.bot - z.top) dy = r.top - z.top;
-  if (o.again && dy < 0) return; /* повторная проверка только докручивает вниз: шапка сжимается при прокрутке, иначе возврат к 0 и «качели» */ if (Math.abs(dy) > 1) { const sm = !(o.instant || matchMedia('(prefers-reduced-motion: reduce)').matches); scrollBy({top: dy, behavior: sm ? 'smooth' : 'auto'}); if (sm && !o.again) setTimeout(() => el.isConnected && reveal(el, {instant: true, again: true}), 420); } }
+  if (o.again && dy < 0) { const tg = Math.max(10, scrollY + dy); if (r.bottom + (scrollY - tg) <= z.bot + 16 && tg < scrollY - 1) scrollTo({top: tg, behavior: 'auto'}); return; } /* шапка уже сжата: подтянуть верх карточки, но не ниже 10px прокрутки (иначе шапка снова раскроется) */ /* повторная проверка только докручивает вниз: шапка сжимается при прокрутке, иначе возврат к 0 и «качели» */ if (Math.abs(dy) > 1) { const sm = !(o.instant || matchMedia('(prefers-reduced-motion: reduce)').matches); scrollBy({top: dy, behavior: sm ? 'smooth' : 'auto'}); if (sm && !o.again) setTimeout(() => el.isConnected && reveal(el, {instant: true, again: true}), 420); } }
 /* виртуальная клавиатура: visualViewport меньше окна → капсула прячется, поле ввода и «Сохранить» остаются над клавиатурой */
 (() => { const vv = window.visualViewport; if (!vv) return; let raf = 0;
   const upd = () => { raf = 0; const kb = Math.max(0, innerHeight - vv.height - vv.offsetTop), on = kb > 120 || (innerHeight < (window.__ffH0 || innerHeight) - 120 && /INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName || ''));
